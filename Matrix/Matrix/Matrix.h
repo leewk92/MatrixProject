@@ -42,8 +42,8 @@ public:
 	Matrix& operator- (double k);
 	Matrix& operator* (double k);
 	Matrix& operator/ (double k);
-
 	Matrix& operator- ();
+	friend bool operator== (const Matrix left, const Matrix right);
 	friend Matrix& operator+(double k, const Matrix& right);
 	friend Matrix& operator*(double k, const Matrix& right);
 	friend Matrix& operator-(double k, const Matrix& right);
@@ -101,12 +101,18 @@ Matrix Matrix::Zeros(int l,int m){
 
 // Operator overloadings
 Matrix& Matrix::operator+ (const Matrix& right) {
-	//assert(row==right.row && col==right.col,"ERROR:size must be same");
-	
-	
+	cout << row << ","<<col<<endl;
+	cout << right.row << ","<<right.col<<endl;
+	assert(row==right.row && col==right.col,"ERROR : size must be same");
+
 	Matrix retMat(col,row);
-
-
+	for(int i=0; i<col ;i++){
+		for(int j=0; j<row ;j++){
+			retMat.mat[i][j] = this->mat[i][j] + right.mat[i][j];
+		}
+	}
+//	retMat.col = col;
+//	retMat.row = row;
 	return retMat;
 }
 Matrix& Matrix::operator- (const Matrix& right) {
@@ -136,6 +142,18 @@ Matrix& Matrix::operator/ (double k) {
 Matrix& Matrix::operator-(){
 	Matrix retMat;
 	return retMat;
+}
+bool operator== (const Matrix left, const Matrix right){
+	assert(left.row == right.row && left.col==right.col,"size must be same");
+	int col = left.col;
+	int row = left.row;
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			if(left.mat[i][j] != right.mat[i][j])
+				return false;
+		}
+	}
+	return true;
 }
 
 double& Matrix::operator()(int l,int m){
