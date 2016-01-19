@@ -105,19 +105,28 @@ Matrix& Matrix::operator+ (const Matrix& right) {
 	cout << right.row << ","<<right.col<<endl;
 	assert(row==right.row && col==right.col,"ERROR : size must be same");
 
-	Matrix retMat(col,row);
+	Matrix *retMat = new Matrix(col,row);
 	for(int i=0; i<col ;i++){
 		for(int j=0; j<row ;j++){
-			retMat.mat[i][j] = this->mat[i][j] + right.mat[i][j];
+			retMat->mat[i][j] = this->mat[i][j] + right.mat[i][j];
 		}
 	}
-//	retMat.col = col;
-//	retMat.row = row;
-	return retMat;
+	cout << "return row , col : " << retMat->row<<","<< retMat->col<<endl;
+	return *retMat;
 }
 Matrix& Matrix::operator- (const Matrix& right) {
-	Matrix retMat;
-	return retMat;
+	cout << row << ","<<col<<endl;
+	cout << right.row << ","<<right.col<<endl;
+	assert(row==right.row && col==right.col,"ERROR : size must be same");
+
+	Matrix *retMat = new Matrix(col,row);
+	for(int i=0; i<col ;i++){
+		for(int j=0; j<row ;j++){
+			retMat->mat[i][j] = this->mat[i][j] - right.mat[i][j];
+		}
+	}
+	cout << "return row , col : " << retMat->row<<","<< retMat->col<<endl;
+	return *retMat;
 }
 Matrix& Matrix::operator* (const Matrix& right) {
 	Matrix retMat;
@@ -140,8 +149,13 @@ Matrix& Matrix::operator/ (double k) {
 	return retMat;
 }
 Matrix& Matrix::operator-(){
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(col,row);
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			retMat->mat[i][j] = - (this->mat[i][j]);
+		}
+	}
+	return *retMat;
 }
 bool operator== (const Matrix left, const Matrix right){
 	assert(left.row == right.row && left.col==right.col,"size must be same");

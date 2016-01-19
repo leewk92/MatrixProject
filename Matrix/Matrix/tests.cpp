@@ -6,10 +6,15 @@
 //typedef int Matrix;
 static Matrix MATRIX;
 
-Matrix A(2),B(2),C(2);
 Matrix Zeros = MATRIX.Zeros(2);
 double k;
+Matrix A = Matrix(2);
+Matrix B = Matrix(2);
+Matrix C = Matrix(2);
+
+
 void prepareTest(){
+	
 	A(1,1) = 1;
 	A(1,2) = 2;
 	A(2,1) = 3;
@@ -23,16 +28,18 @@ void prepareTest(){
 	C(2,1) = 5;
 	C(2,2) = 6;
 	k = 2.;
-}	
+}
+
 // 행렬 더하기
 TEST(MATRIX_ADD_TEST,COMMUTATIVE){
 	prepareTest();
-	EXPECT_EQ(A+B, B+A);
+	
+	EXPECT_EQ(A + B, B + A);
 }
 
 TEST(MATRIX_ADD_TEST,ASSOCIATIVE){
 	prepareTest();
-	EXPECT_EQ((A+B)+C, A+(B+C));
+	EXPECT_EQ((A+B)+ C, A+(B + C));
 }
 
 TEST(MATRIX_ADD_TEST,IDENTITY_ELEMENT){
@@ -45,7 +52,6 @@ TEST(MATRIX_ADD_TEST,INVERSE_ELEMENT){
 	EXPECT_EQ(A+(-A), (-A)+A);
 	EXPECT_EQ(A+(-A),Zeros);
 }
-
 
 // 행렬 빼기
 TEST(MATRIX_SUB_TEST,){ // TODO
