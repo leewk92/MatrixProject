@@ -217,8 +217,13 @@ TEST(MATRIX_INVERSE_TEST, DISTRIBUTION_FOR_CONSTANT){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
 	EXPECT_EQ( (k*A).inv(), 1/k*A.inv());
 }
+TEST(MATRIX_INVERSE_TEST, IDENTITY){
+	Matrix A = MATRIX.Rands(3);
+	EXPECT_EQ( A.inv() * A, MATRIX.Eyes(3));
+}
+
 TEST(MATRIX_INVERSE_TEST, LARGE_MATRIX){
-	Matrix A = MATRIX.Rands(6);
+	Matrix A = MATRIX.Rands(5);
 	EXPECT_EQ( (k*A).inv(), 1/k*A.inv());
 }
 
