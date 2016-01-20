@@ -12,9 +12,7 @@ private:
 public:
 	Index();
 	Index(const int& index);
-	
     Index& operator= (const int& i) ;	// conversion from int (assignment):
-    
     operator int();	// conversion to int (type-cast operator)
 };
 

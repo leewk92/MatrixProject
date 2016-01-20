@@ -9,7 +9,8 @@
 #define MATRIX_H
 
 #include <iostream>
-#include <deque>
+#include <cstdlib>
+#include <ctime>
 #include "Index.h"
 using namespace std;
 
@@ -36,7 +37,8 @@ public:
 	static Matrix Ones(int n);
 	static Matrix Ones(int l, int m);
 	static Matrix Eyes(int n);
-	
+	static Matrix Rands(int n);
+
 	// functions
 	Matrix& T();			// transpose
 	Matrix& inv();			// inverse 
@@ -185,6 +187,18 @@ Matrix Matrix::Eyes(int n){
 	}
 	return *retMat;
 }
+Matrix Matrix::Rands(int n){
+	srand((unsigned int)time(NULL));
+	Matrix *retMat = new Matrix(n);
+	for(int i=0; i<n; i++){
+		for(int j=0; j<n; j++){
+			retMat->mat[i][j] = (double)(rand()- RAND_MAX)*2./(double)RAND_MAX;
+		}
+	}
+	return *retMat;
+}
+
+
 
 // functions
 Matrix& Matrix::T(){
