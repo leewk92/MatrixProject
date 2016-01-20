@@ -7,6 +7,7 @@
 static Matrix MATRIX;
 
 Matrix Zeros = MATRIX.Zeros(2);
+Matrix Eyes = MATRIX.Eyes(2);
 double k = 2.;
 
 Matrix A = Matrix("1,2;3,4");
@@ -114,5 +115,20 @@ TEST(MATRIX_TRANSPOSE_TSET,CHAINING){
 }
 
 // 특정 원소 수정
+TEST(MATRIX_ACCESS_TEST,VALUE){
+	Matrix tmpA("1,2,3;4,5,6;7,8,9");
+	Matrix tmpB("1,2,3;1,5,6;7,4,9");
+	tmpA(2,1) = 1;
+	tmpA(3,2) = 4;
 
+	EXPECT_EQ(tmpA,tmpB);
+}
+
+// 단위행렬 테스트
+TEST(MATRIX_EYES_TEST,IDENTITY){
+	EXPECT_EQ(A,A*Eyes);
+}
+TEST(MATRIX_EYES_TEST,COMMUTATIVE){
+	EXPECT_EQ(Eyes*A,A*Eyes);
+}
 #endif

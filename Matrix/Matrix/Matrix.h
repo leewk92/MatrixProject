@@ -125,6 +125,9 @@ Matrix::Matrix(string sentence){
 	for(int i=0; i<col; i++){
 		vector<string> col_string;
 		Tokenize(row_string[i],col_string,",");
+		if(i !=0)
+			assert(this->row == col_string.size(),"row size must be consistent");
+
 		this->row = col_string.size();
 		mat[i] = new double[row];
 		for(int j=0; j<row; j++){
@@ -139,14 +142,39 @@ Matrix::~Matrix(){
 
 // static factory methods
 Matrix Matrix::Zeros(int n){
-	Matrix retMat = Matrix(n);
-	return retMat;
+	Matrix *retMat = new Matrix(n);
+	return *retMat;
 }
 Matrix Matrix::Zeros(int l,int m){
-	Matrix retMat = Matrix(l,m);
-	return retMat;
+	Matrix *retMat = new Matrix(l,m);
+	return *retMat;
 }
 
+Matrix Matrix::Ones(int n){
+	Matrix *retMat = new Matrix(n);
+	for(int i=0; i<n; i++){
+		for(int j=0; j<n;j++){
+			retMat->mat[i][j] = 1;
+		}
+	}
+	return *retMat;
+}
+Matrix Matrix::Ones(int l,int m){
+	Matrix *retMat = new Matrix(l,m);
+	for(int i=0; i<l; i++){
+		for(int j=0; j<m;j++){
+			retMat->mat[i][j] = 1;
+		}
+	}
+	return *retMat;
+}
+Matrix Matrix::Eyes(int n){
+	Matrix *retMat = new Matrix(n);
+	for(int i=0; i<n; i++){
+		retMat->mat[i][i] = 1;
+	}
+	return *retMat;
+}
 
 // functions
 Matrix& Matrix::T(){
@@ -158,12 +186,6 @@ Matrix& Matrix::T(){
 	}
 	return *retMat;
 }
-
-
-
-
-
-
 
 
 
