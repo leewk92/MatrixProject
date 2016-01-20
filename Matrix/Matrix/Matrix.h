@@ -10,8 +10,10 @@
 
 #include <iostream>
 #include <deque>
-
+#include "Index.h"
 using namespace std;
+
+const double SMALLVAL = 0.0000001;
 
 class Matrix{
 private:
@@ -36,7 +38,12 @@ public:
 	static Matrix Eyes(int n);
 	
 	// functions
-	Matrix& T();
+	Matrix& T();			// transpose
+	Matrix& inv();			// inverse 
+	double det();			// determinant;
+	double cofactor(Index l, Index m);		// cofactor;
+	Matrix& adjoint();		// adjoint matrix
+	Matrix& minor();		// minor matrix
 
 	// operator overload
 	Matrix& operator+ (const Matrix& right);
@@ -48,7 +55,9 @@ public:
 	Matrix& operator/ (double k);
 	Matrix& operator- ();
 	Matrix& operator= (const Matrix& right);
-	
+
+
+
 	void operator+= (double k);
 	void operator-= (double k);
 	void operator*= (double k);
@@ -60,7 +69,8 @@ public:
 	friend Matrix& operator-(double k, const Matrix& right);
 	friend ostream& operator<<(ostream& os, const Matrix& right);
 	
-	double& operator()(int l,int m);
+	//double& operator()(int l,int m);
+	double& operator()(Index l,Index m);
 	
 	//getter, setter
 	int getRow();
@@ -125,9 +135,9 @@ Matrix::Matrix(string sentence){
 	for(int i=0; i<col; i++){
 		vector<string> col_string;
 		Tokenize(row_string[i],col_string,",");
-		if(i !=0)
+		if(i !=0) {
 			assert(this->row == col_string.size(),"row size must be consistent");
-
+		}
 		this->row = col_string.size();
 		mat[i] = new double[row];
 		for(int j=0; j<row; j++){
@@ -187,11 +197,74 @@ Matrix& Matrix::T(){
 	return *retMat;
 }
 
+Matrix& Matrix::inv(){			// inverse 
+	assert(row == col , "row and col number must be same for calculating inverse matrix");
+	assert(det() != 0 , "determinant must not be zero for obtaining inverse matrix");
+	return 1./det() * adjoint();
+}
+double Matrix::det(){			// determinent
+	double retVal = 0.;
 
+	assert(row == col , "row and col number must be same for calculating determindet");
+	if(row == 2){
+		retVal = mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
+		return retVal;
+	}
+	Matrix minorMatrix;
+	minorMatrix = minor();
+	for(int i=1; i<=row; i++){
+		retVal += (*this)(1,i) * minorMatrix(1,i) * pow(-1,(i+1));
+	}
+	return retVal;
+}
 
+Matrix& Matrix::minor(){
+	assert(row == col , "row and col number must be same for calculating minor matrix");
+	Matrix* retMat = new Matrix(col,row);
+	for(int i=1; i<=col; i++){
+		for(int j=1; j<=row; j++){
+			(*retMat)(i,j) = cofactor(i,j);	
+			if((i+j) %2 ==1)	
+				(*retMat)(i,j) *= -1;
+		}
+	}
+	return *retMat;
+}
 
+double Matrix::cofactor(Index l, Index m){
+	Matrix tmpMat(col-1,row-1);
+	int col_index=1;
+	for(int i=1; i<=col; i++){
+		int row_index=1;
+		if(i==l) continue;
+		for(int j=1; j<=row; j++){			
+			if(j==m) continue;			
+			tmpMat(col_index,row_index) = (*this)(i,j);
+			row_index++;
+		}
+		col_index++;
+	}
+	double retVal= tmpMat.det();
+	
+	if((l+m) %2 != 0){
+		retVal = retVal* (-1);
+	}
+	return retVal;
+}
 
-
+Matrix& Matrix::adjoint(){		// adjoint matrix
+	Matrix* retMat = new Matrix(col,row);
+	*retMat = minor();
+	for(int i=1; i<=col; i++){
+		for(int j=1; j<=row; j++){
+			if((i+j) %2 == 1){
+				(*retMat)(i,j) *= -1;		
+			}
+		}
+	}
+	return (*retMat).T();
+}
+	
 
 // Operator overloadings
 Matrix& Matrix::operator+ (const Matrix& right) {
@@ -295,19 +368,29 @@ bool operator== (const Matrix left, const Matrix right){
 	int row = left.row;
 	for(int i=0; i<col; i++){
 		for(int j=0; j<row; j++){
-			if(left.mat[i][j] != right.mat[i][j])
+			if(abs(left.mat[i][j] - right.mat[i][j]) > SMALLVAL)			//  compare double values 
 				return false;
 		}
 	}
 	return true;
 }
 
-double& Matrix::operator()(int l,int m){
+
+double& Matrix::operator()(Index l,Index m){
+	
 	assert(l>=1 && m >=1 ,"index >= 1");
 	assert(m<=row ,"index <= row");
 	assert(l<=col ,"index <= column");
 	return mat[l-1][m-1];
 }
+
+
+//double& Matrix::operator()(int l,int m){
+//	assert(l>=1 && m >=1 ,"index >= 1");
+//	assert(m<=row ,"index <= row");
+//	assert(l<=col ,"index <= column");
+//	return mat[l-1][m-1];
+//}
 
 
 void Matrix::operator+= (double k){
@@ -382,9 +465,6 @@ ostream& operator<<(ostream& os, const Matrix& right)
 	}
     return os;
 }
-
-
-
 
 
 #endif

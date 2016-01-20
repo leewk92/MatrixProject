@@ -1,3 +1,9 @@
+/* Reference : http://matrix.skku.ac.kr/sglee/linear/ocu/thm.html
+ * 
+ * 
+ */
+
+
 #ifndef TESTS_CPP
 #define TESTS_CPP
 #include <gtest\gtest.h>
@@ -104,15 +110,25 @@ TEST(MATRIX_CONSTANT_DEVIDE_TEST,SELF){ // TODO
 	EXPECT_EQ(tmpA, A/k);
 }
 
-// Transpose
+// 전치행렬(Transpose) : 정리4 
 TEST(MATRIX_TRANSPOSE_TEST,VALUE){
 	Matrix tmpA("1,2,3;4,5,6");
 	Matrix tmpTransposeA("1,4;2,5;3,6");
 	EXPECT_EQ(tmpA.T(), tmpTransposeA);
 }
-TEST(MATRIX_TRANSPOSE_TSET,CHAINING){
+TEST(MATRIX_TRANSPOSE_TEST,CHAINING){
 	EXPECT_EQ(A.T().T(),A);
 }
+TEST(MATRIX_TRANSPOSE_TEST,DISTRIBUTION){
+	EXPECT_EQ((A+B).T(), A.T()+B.T());
+}
+TEST(MATRIX_TRANSPOSE_TEST,REVERSE){
+	EXPECT_EQ((A*B).T(), B.T()*A.T());
+}
+TEST(MATRIX_TRANSPOSE_TEST,DISTRIBUTION_FOR_CONSTANT_MULTIPLY){
+	EXPECT_EQ((k*A).T(), k*A.T());
+}
+
 
 // 특정 원소 수정
 TEST(MATRIX_ACCESS_TEST,VALUE){
@@ -131,4 +147,48 @@ TEST(MATRIX_EYES_TEST,IDENTITY){
 TEST(MATRIX_EYES_TEST,COMMUTATIVE){
 	EXPECT_EQ(Eyes*A,A*Eyes);
 }
+
+// 소행렬 테스트
+TEST(MATRIX_MINOR_TEST,VALUE){
+
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix result("2,2,2;-2,3,3;0,-10,0");
+
+	EXPECT_EQ(A.minor(), result);
+}
+
+// 수반행렬 테스트
+TEST(MATRIX_ADJOINT_TEST,VALUE){
+
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix result("2,2,0;-2,3,10;2,-3,0");
+
+	EXPECT_EQ(A.adjoint(), result);
+}
+
+// 행렬식 테스트
+TEST(MATRIX_DETERMINENT_TEST,VALUE){
+
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	double result = 10.;
+
+	EXPECT_EQ(A.det(), result);
+}
+
+
+// 역행렬 테스트
+TEST(MATRIX_INVERSE_TEST,VALUE){
+
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix result("0.2,0.2,0;-0.2,0.3,1;0.2,-0.3,0");
+	EXPECT_EQ(A.inv(), result);
+}
+TEST(MATRIX_INVERSE_TEST,CHAINING){
+
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	EXPECT_EQ(A.inv().inv(), A);
+}
+
+
+
 #endif
