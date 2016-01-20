@@ -11,6 +11,7 @@
 #define MATRIX_H
 
 #include <iostream>
+#include <deque>
 
 using namespace std;
 
@@ -25,6 +26,7 @@ public:
 	Matrix();
 	Matrix(int n);
 	Matrix(int l,int m);
+	Matrix(string sentence);
 
 	// static Factory methods
 	static Matrix Zeros(int n);
@@ -47,9 +49,9 @@ public:
 	friend Matrix& operator+(double k, const Matrix& right);
 	friend Matrix& operator*(double k, const Matrix& right);
 	friend Matrix& operator-(double k, const Matrix& right);
-	
+	friend ostream& operator<<(ostream& os, const Matrix& right);
 	double& operator()(int l,int m);
-		
+	
 	//getter, setter
 	int getRow();
 	int getCol();
@@ -88,6 +90,43 @@ Matrix::Matrix(int l,int m){
 	this->row = m;
 }
 
+void Tokenize(const string& str, vector<string>& tokens, const string& delimiters = " ")
+{
+    // 맨 첫 글자가 구분자인 경우 무시
+    string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+    // 구분자가 아닌 첫 글자를 찾는다
+    string::size_type pos     = str.find_first_of(delimiters, lastPos);
+
+    while (string::npos != pos || string::npos != lastPos)
+    {
+        // token을 찾았으니 vector에 추가한다
+        tokens.push_back(str.substr(lastPos, pos - lastPos));
+        // 구분자를 뛰어넘는다.  "not_of"에 주의하라
+        lastPos = str.find_first_not_of(delimiters, pos);
+        // 다음 구분자가 아닌 글자를 찾는다
+        pos = str.find_first_of(delimiters, lastPos);
+    }
+}
+
+Matrix::Matrix(string sentence){
+	vector<string> row_string;
+	//assert(sentence[0] =='[' && sentence[sentence.size()-1]==']',"sentence must be start with '[' and end with ']'");
+	Tokenize(sentence, row_string,";");
+	this->col = row_string.size();
+	mat = new double*[col];
+	for(int i=0; i<col; i++){
+		vector<string> col_string;
+		Tokenize(row_string[i],col_string,",");
+		this->row = col_string.size();
+		mat[i] = new double[row];
+		for(int j=0; j<row; j++){
+			mat[i][j] = stod(col_string[j]);
+		}
+	}	
+}
+
+
+
 // static factory methods
 Matrix Matrix::Zeros(int n){
 	Matrix retMat = Matrix(n);
@@ -101,8 +140,6 @@ Matrix Matrix::Zeros(int l,int m){
 
 // Operator overloadings
 Matrix& Matrix::operator+ (const Matrix& right) {
-	cout << row << ","<<col<<endl;
-	cout << right.row << ","<<right.col<<endl;
 	assert(row==right.row && col==right.col,"ERROR : size must be same");
 
 	Matrix *retMat = new Matrix(col,row);
@@ -111,12 +148,9 @@ Matrix& Matrix::operator+ (const Matrix& right) {
 			retMat->mat[i][j] = this->mat[i][j] + right.mat[i][j];
 		}
 	}
-	cout << "return row , col : " << retMat->row<<","<< retMat->col<<endl;
 	return *retMat;
 }
 Matrix& Matrix::operator- (const Matrix& right) {
-	cout << row << ","<<col<<endl;
-	cout << right.row << ","<<right.col<<endl;
 	assert(row==right.row && col==right.col,"ERROR : size must be same");
 
 	Matrix *retMat = new Matrix(col,row);
@@ -125,28 +159,57 @@ Matrix& Matrix::operator- (const Matrix& right) {
 			retMat->mat[i][j] = this->mat[i][j] - right.mat[i][j];
 		}
 	}
-	cout << "return row , col : " << retMat->row<<","<< retMat->col<<endl;
 	return *retMat;
 }
 Matrix& Matrix::operator* (const Matrix& right) {
-	Matrix retMat;
-	return retMat;
+	assert(row==right.col,"ERROR : left.row must be same to right.col");
+	
+	Matrix *retMat = new Matrix(this->col, right.row);
+	for(int i=0; i<this->col; i++){
+		for(int j=0; j<right.row;j++){
+			for(int k=0; k<this->row; k++){
+				retMat->mat[i][j] += this->mat[i][k] * right.mat[k][j];				
+			}
+		}
+	}
+	return *retMat;
 }
+
 Matrix& Matrix::operator+ (double k) {
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(col,row);
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			retMat->mat[i][j] =mat[i][j]+k;
+		}
+	}
+	return *retMat;
 }
 Matrix& Matrix::operator- (double k) {
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(col,row);
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			retMat->mat[i][j] =mat[i][j]-k;
+		}
+	}
+	return *retMat;
 }
 Matrix& Matrix::operator* (double k) {
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(col,row);
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			retMat->mat[i][j] =mat[i][j]*k;
+		}
+	}
+	return *retMat;
 }
 Matrix& Matrix::operator/ (double k) {
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(col,row);
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			retMat->mat[i][j] = mat[i][j]/k;
+		}
+	}
+	return *retMat;
 }
 Matrix& Matrix::operator-(){
 	Matrix *retMat = new Matrix(col,row);
@@ -177,6 +240,7 @@ double& Matrix::operator()(int l,int m){
 	return mat[l-1][m-1];
 }
 
+
 void Matrix::print(){
 	for(int i=0; i<col; i++){
 		for(int j=0; j<row; j++){
@@ -189,19 +253,46 @@ void Matrix::print(){
 
 // 전역함수
 Matrix& operator+(double k, const Matrix& right){
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(right.col,right.row);
+	for(int i=0; i<right.col; i++){
+		for(int j=0; j<right.row; j++){
+			retMat->mat[i][j] = k+right.mat[i][j];
+		}
+	}
+	return *retMat;
 }
 
 Matrix& operator-(double k, const Matrix& right){
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(right.col,right.row);
+	for(int i=0; i<right.col; i++){
+		for(int j=0; j<right.row; j++){
+			retMat->mat[i][j] =k-right.mat[i][j];
+		}
+	}
+	return *retMat;
 }
 
 Matrix& operator*(double k, const Matrix& right){
-	Matrix retMat;
-	return retMat;
+	Matrix *retMat = new Matrix(right.col,right.row);
+	for(int i=0; i<right.col; i++){
+		for(int j=0; j<right.row; j++){
+			retMat->mat[i][j] =k*right.mat[i][j];
+		}
+	}
+	return *retMat;
 }
+
+ostream& operator<<(ostream& os, const Matrix& right)
+{
+   for(int i=0; i<right.col; i++){
+		for(int j=0; j<right.row; j++){
+			os <<" "<< right.mat[i][j] << " ";
+		}
+		os << endl;
+	}
+    return os;
+}
+
 
 
 
