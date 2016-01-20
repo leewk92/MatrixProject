@@ -206,6 +206,9 @@ double Matrix::det(){			// determinent
 	double retVal = 0.;
 
 	assert(row == col , "row and col number must be same for calculating determindet");
+	if (row==1){
+		return mat[0][0];
+	}
 	if(row == 2){
 		retVal = mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
 		return retVal;

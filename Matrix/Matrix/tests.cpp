@@ -165,28 +165,57 @@ TEST(MATRIX_ADJOINT_TEST,VALUE){
 
 	EXPECT_EQ(A.adjoint(), result);
 }
-
-// 행렬식 테스트
-TEST(MATRIX_DETERMINENT_TEST,VALUE){
+TEST(MATRIX_ADJOINT_TEST,INVERSE){ // 정리 21
 
 	Matrix A("3,0,2;2,0,-2;0,1,1");
-	double result = 10.;
-
-	EXPECT_EQ(A.det(), result);
+	
+	EXPECT_EQ(A.inv(), 1/A.det()*A.adjoint());
 }
 
 
-// 역행렬 테스트
-TEST(MATRIX_INVERSE_TEST,VALUE){
+// 행렬식 테스트
+TEST(MATRIX_DETERMINENT_TEST,VALUE){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	double result = 10.;
+	EXPECT_EQ(A.det(), result);
+}
+TEST(MATRIX_DETERMINENT_TEST,TRANSPOSE){ //정리 11
+	//Matrix A("3,0,2;2,0,-2;0,1,1");
+	EXPECT_EQ(A.det(), A.T().det());
+}
+TEST(MATRIX_DETERMINENT_TEST,DISTRIBUTION_FOR_MULTIPLY){ // 정리 18
+	//Matrix A("3,0,2;2,0,-2;0,1,1");
+	//Matrix B("1,2,6;3,4,5;1,0,5");
+	EXPECT_EQ( (A*B).det() , A.det() * B.det() );
+}
+TEST(MATRIX_DETERMINENT_TEST,REVERSE_FOR_INVERSE){ // 정리 18
+	//Matrix A("3,0,2;2,0,-2;0,1,1");
+	EXPECT_EQ( (A.inv()).det() , 1/A.det() );
+}
 
+
+// 역행렬 테스트 : 정리 7
+TEST(MATRIX_INVERSE_TEST,VALUE){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
 	Matrix result("0.2,0.2,0;-0.2,0.3,1;0.2,-0.3,0");
 	EXPECT_EQ(A.inv(), result);
 }
 TEST(MATRIX_INVERSE_TEST,CHAINING){
-
-	Matrix A("3,0,2;2,0,-2;0,1,1");
+	//Matrix A("3,0,2;2,0,-2;0,1,1");
 	EXPECT_EQ(A.inv().inv(), A);
+}
+TEST(MATRIX_INVERSE_TEST,REVERSE){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix B("1,2,6;3,4,5;1,0,5");
+	EXPECT_EQ( (A*B).inv(), B.inv() * A.inv() );
+}
+TEST(MATRIX_INVERSE_TEST, COMMUTATIVE_FOR_TRANSPOSE){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	EXPECT_EQ( (A.T()).inv(), (A.inv()).T());
+}
+TEST(MATRIX_INVERSE_TEST, DISTRIBUTION_FOR_CONSTANT){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	EXPECT_EQ( (k*A).inv(), 1/k*A.inv());
 }
 
 
