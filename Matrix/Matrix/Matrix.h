@@ -5,8 +5,6 @@
  *
  */
 
-
-
 #ifndef MATRIX_H
 #define MATRIX_H
 
@@ -45,19 +43,25 @@ public:
 	Matrix& operator* (double k);
 	Matrix& operator/ (double k);
 	Matrix& operator- ();
+	Matrix& operator= (const Matrix& right);
+
+	void operator+= (double k);
+	void operator-= (double k);
+	void operator*= (double k);
+	void operator/= (double k);
+
 	friend bool operator== (const Matrix left, const Matrix right);
 	friend Matrix& operator+(double k, const Matrix& right);
 	friend Matrix& operator*(double k, const Matrix& right);
 	friend Matrix& operator-(double k, const Matrix& right);
 	friend ostream& operator<<(ostream& os, const Matrix& right);
+	
 	double& operator()(int l,int m);
 	
 	//getter, setter
 	int getRow();
 	int getCol();
 
-	//print 
-	void print();
 };
 
 // Constructors
@@ -220,6 +224,20 @@ Matrix& Matrix::operator-(){
 	}
 	return *retMat;
 }
+
+Matrix& Matrix::operator= (const Matrix& right){
+	row = right.row;
+	col = right.col;
+	mat = new double*[col];
+	for(int i=0; i<col; i++){
+		mat[i] = new double[row];
+		for(int j=0; j<row; j++){
+			mat[i][j] = right.mat[i][j];
+		}
+	}
+	return *this;
+}
+
 bool operator== (const Matrix left, const Matrix right){
 	assert(left.row == right.row && left.col==right.col,"size must be same");
 	int col = left.col;
@@ -241,14 +259,35 @@ double& Matrix::operator()(int l,int m){
 }
 
 
-void Matrix::print(){
+void Matrix::operator+= (double k){
 	for(int i=0; i<col; i++){
 		for(int j=0; j<row; j++){
-			cout <<" "<< mat[i][j] << " ";
+			mat[i][j] += k;
 		}
-		cout << endl;
 	}
 }
+void Matrix::operator-= (double k){
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			mat[i][j] -= k;
+		}
+	}
+}
+void Matrix::operator*= (double k){
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			mat[i][j] *= k;
+		}
+	}
+}
+void Matrix::operator/= (double k){
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			mat[i][j] /= k;
+		}
+	}
+}
+
 
 
 // 전역함수
