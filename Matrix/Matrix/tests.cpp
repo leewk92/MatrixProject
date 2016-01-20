@@ -39,7 +39,7 @@ TEST(MATRIX_ADD_TEST,INVERSE_ELEMENT){
 }
 
 // 행렬 빼기
-TEST(MATRIX_SUB_TEST,){ // TODO
+TEST(MATRIX_SUB_TEST,CHAINING){ 
 	EXPECT_EQ(-(-A), A);
 }
 
@@ -71,7 +71,7 @@ TEST(MATRIX_CONSTANT_ADD_TEST,SELF){
 }
 
 // 행렬과 상수 빼기
-TEST(MATRIX_CONSTANT_SUB_TEST,){ 
+TEST(MATRIX_CONSTANT_SUB_TEST,OTHER_COMMUTATIVE){ 
 	EXPECT_EQ(k-A,-(A-k));
 }
 TEST(MATRIX_CONSTANT_SUB_TEST,SELF){
@@ -97,9 +97,22 @@ TEST(MATRIX_CONSTANT_DEVIDE_TEST,){
 	EXPECT_EQ(k*A/k,A);
 }
 TEST(MATRIX_CONSTANT_DEVIDE_TEST,SELF){ // TODO
-	Matrix tmp_A;
-	tmp_A = A;
-	tmp_A /=k;
-	EXPECT_EQ(tmp_A, A/k);
+	Matrix tmpA;
+	tmpA = A;
+	tmpA /=k;
+	EXPECT_EQ(tmpA, A/k);
 }
+
+// Transpose
+TEST(MATRIX_TRANSPOSE_TEST,VALUE){
+	Matrix tmpA("1,2,3;4,5,6");
+	Matrix tmpTransposeA("1,4;2,5;3,6");
+	EXPECT_EQ(tmpA.T(), tmpTransposeA);
+}
+TEST(MATRIX_TRANSPOSE_TSET,CHAINING){
+	EXPECT_EQ(A.T().T(),A);
+}
+
+// 특정 원소 수정
+
 #endif

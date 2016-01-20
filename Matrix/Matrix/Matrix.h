@@ -26,6 +26,8 @@ public:
 	Matrix(int l,int m);
 	Matrix(string sentence);
 
+	// Destructor
+	~Matrix();
 	// static Factory methods
 	static Matrix Zeros(int n);
 	static Matrix Zeros(int l,int m);
@@ -33,6 +35,8 @@ public:
 	static Matrix Ones(int l, int m);
 	static Matrix Eyes(int n);
 	
+	// functions
+	Matrix& T();
 
 	// operator overload
 	Matrix& operator+ (const Matrix& right);
@@ -44,7 +48,7 @@ public:
 	Matrix& operator/ (double k);
 	Matrix& operator- ();
 	Matrix& operator= (const Matrix& right);
-
+	
 	void operator+= (double k);
 	void operator-= (double k);
 	void operator*= (double k);
@@ -94,21 +98,21 @@ Matrix::Matrix(int l,int m){
 	this->row = m;
 }
 
-void Tokenize(const string& str, vector<string>& tokens, const string& delimiters = " ")
+void Tokenize(const string& str, vector<string>& tokens, const string& silcer = " ")
 {
     // 맨 첫 글자가 구분자인 경우 무시
-    string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+    string::size_type lastPos = str.find_first_not_of(silcer, 0);
     // 구분자가 아닌 첫 글자를 찾는다
-    string::size_type pos     = str.find_first_of(delimiters, lastPos);
+    string::size_type pos = str.find_first_of(silcer, lastPos);
 
     while (string::npos != pos || string::npos != lastPos)
     {
         // token을 찾았으니 vector에 추가한다
         tokens.push_back(str.substr(lastPos, pos - lastPos));
-        // 구분자를 뛰어넘는다.  "not_of"에 주의하라
-        lastPos = str.find_first_not_of(delimiters, pos);
+        // 구분자를 뛰어넘는다. 
+        lastPos = str.find_first_not_of(silcer, pos);
         // 다음 구분자가 아닌 글자를 찾는다
-        pos = str.find_first_of(delimiters, lastPos);
+        pos = str.find_first_of(silcer, lastPos);
     }
 }
 
@@ -129,7 +133,9 @@ Matrix::Matrix(string sentence){
 	}	
 }
 
-
+// Destructor
+Matrix::~Matrix(){
+}
 
 // static factory methods
 Matrix Matrix::Zeros(int n){
@@ -140,6 +146,29 @@ Matrix Matrix::Zeros(int l,int m){
 	Matrix retMat = Matrix(l,m);
 	return retMat;
 }
+
+
+// functions
+Matrix& Matrix::T(){
+	Matrix *retMat = new Matrix(row,col);
+	for(int i=0; i<retMat->col; i++){
+		for(int j=0; j<retMat->row; j++){
+			retMat->mat[i][j] = this->mat[j][i];
+		}
+	}
+	return *retMat;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Operator overloadings
