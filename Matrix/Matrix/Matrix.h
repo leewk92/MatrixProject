@@ -59,6 +59,7 @@ public:
 	Matrix& operator/ (double k);
 	Matrix& operator- ();
 	Matrix& operator= (const Matrix& right);
+	Matrix& operator<< (const Matrix& right);
 
 	void operator+= (double k);
 	void operator-= (double k);
@@ -470,7 +471,24 @@ void Matrix::operator/= (double k){
 	}
 }
 
+Matrix& Matrix::operator<< (const Matrix& right){
 
+	assert(col == right.col ,"col number must be same");
+
+	Matrix *retMat = new Matrix(col, row + right.row);
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			retMat->mat[i][j] = this->mat[i][j];
+		}
+		for(int j=0; j<right.row; j++){
+			retMat->mat[i][this->row + j] = right.mat[i][j];
+		}
+	}
+	this->row = retMat->row;
+	this->col = retMat->col;
+	this->mat = retMat->mat;
+	return *this;
+}
 
 // 전역함수
 Matrix& operator+(double k, const Matrix& right){
