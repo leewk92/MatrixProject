@@ -50,7 +50,8 @@ public:
 	Matrix& replace(Index detRow,const Matrix& srcMat);
 	Matrix& gaussianElimination();
 	int rank();
-
+	Matrix& slice(Index colStart, Index colEnd, Index rowStart, Index rowEnd);
+	Matrix& gaussianInv();			// inverse by using gaussian elimination
 	// operator overload
 	Matrix& operator+ (const Matrix& right);
 	Matrix& operator- (const Matrix& right);
@@ -69,6 +70,7 @@ public:
 	void operator/= (double k);
 
 	friend bool operator== (const Matrix left, const Matrix right);
+	friend bool operator!= (const Matrix left, const Matrix right);
 	friend Matrix& operator+(double k, const Matrix& right);
 	friend Matrix& operator*(double k, const Matrix& right);
 	friend Matrix& operator-(double k, const Matrix& right);
@@ -343,7 +345,7 @@ Matrix& Matrix::gaussianElimination(){
 //			cout << "-----------------"<<endl<<"devideF : "<<devideFactor<<endl<< *this;
 		}
 	}
-	cout << *this;
+//	cout << *this;
 	return *this;
 }
 int Matrix::rank(){
@@ -358,6 +360,29 @@ int Matrix::rank(){
 	
 	return rank;
 }
+
+Matrix& Matrix::slice(Index colStart, Index colEnd, Index rowStart, Index rowEnd){
+	assert(colStart <= colEnd && rowStart <= rowEnd,"index of end must be equal or larger than index of start");
+	assert(colEnd <= col+1 && rowEnd <= row+1,"index of end must be equal or smaller than size of matrix");
+	assert(colStart >=1 && rowStart >=1 , "Index of start must be equal or larger than 1");
+	Matrix *retMat = new Matrix(colEnd-colStart+1,rowEnd-rowStart+1);
+	for(Index i=1; i<= retMat->col; i++){
+		for(Index j=1; j<= retMat->row; j++){
+			(*retMat)(i,j) = (*this)(colStart + i -1, rowStart + j -1 );
+		}
+	}
+
+	return *retMat;
+}
+
+Matrix& Matrix::gaussianInv(){
+	Matrix* retMat = new Matrix(col,row);
+	Matrix tmp = *this;
+	tmp << Eyes(col);
+	*retMat = tmp.gaussianElimination().slice(1,col, row+1, row*2);
+	return *retMat;
+}
+
 
 
 
@@ -469,7 +494,18 @@ bool operator== (const Matrix left, const Matrix right){
 	}
 	return true;
 }
-
+bool operator!= (const Matrix left, const Matrix right){
+	assert(left.row == right.row && left.col==right.col,"size must be same");
+	int col = left.col;
+	int row = left.row;
+	for(int i=0; i<col; i++){
+		for(int j=0; j<row; j++){
+			if(abs(left.mat[i][j] - right.mat[i][j]) > SMALLVAL)			//  compare double values 
+				return true;
+		}
+	}
+	return false;
+}
 
 double& Matrix::operator()(Index l,Index m){
 	
@@ -588,7 +624,6 @@ ostream& operator<<(ostream& os, const Matrix& right)
 
 // getter, setter
 int Matrix::getCol(){
-
 	return col;
 }
 int Matrix::getRow(){

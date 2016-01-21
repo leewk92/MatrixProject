@@ -225,7 +225,7 @@ TEST(MATRIX_INVERSE_TEST, IDENTITY){
 
 TEST(MATRIX_INVERSE_TEST, LARGE_MATRIX){
 	Matrix A = MATRIX.Rands(5);
-	EXPECT_EQ( (k*A).inv(), 1/k*A.inv());
+	EXPECT_EQ( A.inv(), A.gaussianInv());
 }
 
 // 열 구하기
@@ -284,5 +284,25 @@ TEST(MATRIX_RANK_TEST,VALUE3){
 	Matrix A("1,2;2,4;1,3;5,7");
 	EXPECT_EQ(A.rank() , 2);
 }
+
+// Slice
+TEST(MATRIX_SLICE_TEST,VALUE){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix B = A.slice(1,2,1,2);
+	Matrix result("3,0;2,0");
+	EXPECT_EQ(B,result);
+}
+
+// 가우스 소거법을 이용한 역행렬
+TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TSET,VALUE){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	EXPECT_EQ(A.gaussianInv(), A.inv());
+}
+
+TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TSET,LARGE){
+	Matrix A = MATRIX.Rands(300);
+	EXPECT_TRUE (A.gaussianInv());
+}
+
 
 #endif
