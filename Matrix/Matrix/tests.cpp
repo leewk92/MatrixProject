@@ -227,5 +227,12 @@ TEST(MATRIX_INVERSE_TEST, LARGE_MATRIX){
 	EXPECT_EQ( (k*A).inv(), 1/k*A.inv());
 }
 
+// 열 구하기
+TEST(MATRIX_ROWMATRIX_TEST, OPERATOR){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix A3("0,1,1");
+	EXPECT_EQ(A(3),A3);
+
+}
 
 #endif
