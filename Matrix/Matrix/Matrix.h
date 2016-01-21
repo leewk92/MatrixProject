@@ -295,6 +295,7 @@ Matrix& Matrix::replace(Index firstRow,Index secondRow){
 }
 Matrix& Matrix::replace(Index detRow,const Matrix& srcMat){
 	assert(detRow >=1,"Index >=1");
+	assert(srcMat.col == 1 && srcMat.row == row , "srcMatrix must have 1 column. also row number must be same with destination matrix."); 
 
 	for(int i=0; i<row; i++){
 		mat[detRow-1][i] = srcMat.mat[0][i];
