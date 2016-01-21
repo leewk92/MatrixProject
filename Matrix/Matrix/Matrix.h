@@ -12,15 +12,27 @@
 #include <cstdlib>
 #include <ctime>
 #include "Index.h"
-using namespace std;
+#include "Global.h"
+#include <functional>
+#include <string>
+#include <map>
 
-const double SMALLVAL = 0.0000001;
+using namespace std;
 
 class Matrix{
 private:
 	double **mat;
 	int row;
 	int col;
+	map<string, function<double(double,double)>> functions;
+
+	// functions
+	void initializeFunctions();
+	bool makeFirstLeadingEntryNotZero(Index i);
+	void gaussianElimination(bool isRREF);	// ifRREF is false then it makes REF
+	Matrix* operateLoop(Matrix* detMat, const Matrix& right, string _operator);
+	Matrix* operateLoop(Matrix* detMat, double k , string _operator);
+
 public:
 
 	// Constructors
@@ -48,12 +60,17 @@ public:
 	Matrix& minor();		// minor matrix
 	Matrix& replace(Index firstRow,Index secondRow);
 	Matrix& replace(Index detRow,const Matrix& srcMat);
-	Matrix& gaussianElimination();
+
+	Matrix& makeREF();		// 사다리꼴 행렬
+	Matrix& makeRREF();		// 기약행 사다리꼴 행렬
+
 	int rank();
 	Matrix& slice(Index colStart, Index colEnd, Index rowStart, Index rowEnd);
 	Matrix& gaussianInv();			// inverse by using gaussian elimination
+	
+
 	// operator overload
-	Matrix& operator+ (const Matrix& right);
+	Matrix& operator+ (const Matrix& right) const;
 	Matrix& operator- (const Matrix& right);
 	Matrix& operator* (const Matrix& right);
 	Matrix& operator+ (double k);
@@ -88,8 +105,11 @@ public:
 
 // Constructors
 Matrix::Matrix(){
+	initializeFunctions();
 }
 Matrix::Matrix(int n){
+	initializeFunctions();
+
 	this->mat = new double*[n];
 	for(int i=0; i<n; i++){
 		mat[i] = new double[n];
@@ -101,8 +121,10 @@ Matrix::Matrix(int n){
 	}
 	this->row = n;
 	this->col = n;
+	
 }
 Matrix::Matrix(int l,int m){
+	initializeFunctions();
 	this->mat = new double*[l];
 	for(int i=0; i<l; i++){
 		mat[i] = new double[m];
@@ -116,25 +138,16 @@ Matrix::Matrix(int l,int m){
 	this->row = m;
 }
 
-void Tokenize(const string& str, vector<string>& tokens, const string& silcer = " ")
-{
-    // 맨 첫 글자가 구분자인 경우 무시
-    string::size_type lastPos = str.find_first_not_of(silcer, 0);
-    // 구분자가 아닌 첫 글자를 찾는다
-    string::size_type pos = str.find_first_of(silcer, lastPos);
-
-    while (string::npos != pos || string::npos != lastPos)
-    {
-        // token을 찾았으니 vector에 추가한다
-        tokens.push_back(str.substr(lastPos, pos - lastPos));
-        // 구분자를 뛰어넘는다. 
-        lastPos = str.find_first_not_of(silcer, pos);
-        // 다음 구분자가 아닌 글자를 찾는다
-        pos = str.find_first_of(silcer, lastPos);
-    }
+void Matrix::initializeFunctions(){
+	functions["+"] = add;
+	functions["-"] = sub;
+	functions["*"] = mult;
+	functions["/"] = devi;
 }
 
+
 Matrix::Matrix(string sentence){
+	initializeFunctions();
 	vector<string> row_string;
 	//assert(sentence[0] =='[' && sentence[sentence.size()-1]==']',"sentence must be start with '[' and end with ']'");
 	Tokenize(sentence, row_string,";");
@@ -204,8 +217,6 @@ Matrix Matrix::Rands(int n){
 	return *retMat;
 }
 
-
-
 // functions
 Matrix& Matrix::T(){
 	Matrix *retMat = new Matrix(row,col);
@@ -256,16 +267,16 @@ Matrix& Matrix::minor(){
 
 double Matrix::cofactor(Index l, Index m){
 	Matrix tmpMat(col-1,row-1);
-	int col_index=1;
+	int colIndex=1;
 	for(int i=1; i<=col; i++){
-		int row_index=1;
+		int rowIndex=1;
 		if(i==l) continue;
 		for(int j=1; j<=row; j++){			
 			if(j==m) continue;			
-			tmpMat(col_index,row_index) = (*this)(i,j);
-			row_index++;
+			tmpMat(colIndex,rowIndex) = (*this)(i,j);
+			rowIndex++;
 		}
-		col_index++;
+		colIndex++;
 	}
 	double retVal= tmpMat.det();
 	
@@ -308,55 +319,75 @@ Matrix& Matrix::replace(Index detRow,const Matrix& srcMat){
 	return *this;
 }
 
-Matrix& Matrix::gaussianElimination(){
-
-	for(int i=0; i<col; i++){
-		Index k=2;
-		Index iIndex = i+1;
+void Matrix::gaussianElimination(bool isRREF){
 	
-		while(mat[i][i] == 0){
-			if(k == col){
-				break;
-			}
-			replace(iIndex, k++); 	
-		}
-		if(abs(mat[i][i]) < SMALLVAL)
+	for(int i=0; i<col; i++){
+		
+		Index iIndex = i+1;
+		if(makeFirstLeadingEntryNotZero(iIndex) == false)
 			continue;
 		double devideFactor = 1 / mat[i][i];
 		replace(iIndex,devideFactor * (*this)(iIndex));
 
 		// 기약형 사다리꼴 행렬(RREF)을 만들기 위한 반복문
-		for(int ref = 0; ref < i; ref ++){
-			Index refIndex = ref+1;
-			if(mat[ref][i] != 0){
-				double multiplyFactor =  mat[ref][i];
+		if(isRREF == true){
+			for(int upper = 0; upper < i; upper ++){
+				Index refIndex = upper+1;
+				if(mat[upper][i] != 0){
+					double multiplyFactor =  mat[upper][i];
 
-				replace(refIndex, (*this)(refIndex)- multiplyFactor*(*this)(iIndex));
+					replace(refIndex, (*this)(refIndex)- multiplyFactor*(*this)(iIndex));
+				}
 			}
 		}
 
-		for(int j=i+1; j<col; j++){
-			Index column = j+1;
-			if(abs(mat[j][i]) <SMALLVAL || abs(mat[i][i]) < 0)
+		for(int lower=i+1; lower<col; lower++){
+			Index currColumn = lower+1;
+			if(abs(mat[lower][i]) <SMALLVAL || abs(mat[i][i]) < SMALLVAL)
 				continue;
-			double devideFactor = mat[i][i] / mat[j][i];
+			double devideFactor = mat[i][i] / mat[lower][i];
 
-			replace(column, (*this)(i+1) - (*this)(column)*devideFactor);
+			replace(currColumn, (*this)(iIndex) - (*this)(currColumn)*devideFactor);
 		}
 	}
-//	cout << *this;
+}
+
+Matrix& Matrix::makeREF(){
+	gaussianElimination(false);
 	return *this;
 }
+
+Matrix& Matrix::makeRREF(){
+	gaussianElimination(true);
+	return *this;
+}
+
+
+bool Matrix::makeFirstLeadingEntryNotZero(Index iIndex){
+	Index k=2;
+	while(mat[iIndex-1][iIndex-1] == 0){
+		if(k == col){
+			break;
+		}
+		replace(iIndex, k++); 	
+	}
+	if(abs(mat[iIndex-1][iIndex-1]) < SMALLVAL)			
+		return false;
+	else 
+		return true;
+}
+
+
 int Matrix::rank(){
-	Matrix gaussian = gaussianElimination();
+	Matrix REF = makeREF();
 	int rank=col;
 	Matrix MATRIX;
 	for(int i=0; i<col; i++){
 		Index iIndex = i+1;
-		if(gaussian(iIndex) == MATRIX.Zeros(1,row))
+		if(REF(iIndex) == MATRIX.Zeros(1,row)){
 			rank--;
+		}
 	}
-	
 	return rank;
 }
 
@@ -370,7 +401,6 @@ Matrix& Matrix::slice(Index colStart,Index rowStart, Index colEnd , Index rowEnd
 			(*retMat)(i,j) = (*this)(colStart + i -1, rowStart + j -1 );
 		}
 	}
-
 	return *retMat;
 }
 
@@ -378,11 +408,34 @@ Matrix& Matrix::gaussianInv(){
 	Matrix* retMat = new Matrix(col,row);
 	Matrix tmp = *this;
 	tmp << Eyes(col);
-	*retMat = tmp.gaussianElimination().slice(1,row+1,col,row*2);
+	*retMat = tmp.makeRREF().slice(1,row+1,col,row*2);
 	return *retMat;
 }
 
 
+Matrix* Matrix::operateLoop(Matrix* detMat, const Matrix& right, string _operator){
+	//initializeFunctions();
+	function<double(double,double)> fnc = functions[_operator];
+	
+	for(int i=0; i<col ;i++){
+		for(int j=0; j<row ;j++){
+				detMat->mat[i][j] =  fnc(this->mat[i][j] , right.mat[i][j]);
+		}
+	}	
+	return detMat;
+}
+
+Matrix* Matrix::operateLoop(Matrix* detMat, double k , string _operator){
+	//initializeFunctions();
+	function<double(double,double)> fnc = functions[_operator];
+	
+	for(int i=0; i<col ;i++){
+		for(int j=0; j<row ;j++){
+				detMat->mat[i][j] =  fnc(this->mat[i][j] , k);
+		}
+	}	
+	return detMat;
+}
 
 
 // Operator overloadings
@@ -390,22 +443,15 @@ Matrix& Matrix::operator+ (const Matrix& right) {
 	assert(row==right.row && col==right.col,"ERROR : size must be same");
 
 	Matrix *retMat = new Matrix(col,row);
-	for(int i=0; i<col ;i++){
-		for(int j=0; j<row ;j++){
-			retMat->mat[i][j] = this->mat[i][j] + right.mat[i][j];
-		}
-	}
+	operateLoop(retMat,right,"+");
+
 	return *retMat;
 }
 Matrix& Matrix::operator- (const Matrix& right) {
 	assert(row==right.row && col==right.col,"ERROR : size must be same");
 
 	Matrix *retMat = new Matrix(col,row);
-	for(int i=0; i<col ;i++){
-		for(int j=0; j<row ;j++){
-			retMat->mat[i][j] = this->mat[i][j] - right.mat[i][j];
-		}
-	}
+	operateLoop(retMat,right,"-");
 	return *retMat;
 }
 Matrix& Matrix::operator* (const Matrix& right) {
@@ -424,40 +470,25 @@ Matrix& Matrix::operator* (const Matrix& right) {
 
 Matrix& Matrix::operator+ (double k) {
 	Matrix *retMat = new Matrix(col,row);
-	for(int i=0; i<col; i++){
-		for(int j=0; j<row; j++){
-			retMat->mat[i][j] =mat[i][j]+k;
-		}
-	}
+	operateLoop(retMat,k,"+");
 	return *retMat;
 }
 Matrix& Matrix::operator- (double k) {
 	Matrix *retMat = new Matrix(col,row);
-	for(int i=0; i<col; i++){
-		for(int j=0; j<row; j++){
-			retMat->mat[i][j] =mat[i][j]-k;
-		}
-	}
+	operateLoop(retMat,k,"-");
 	return *retMat;
 }
 Matrix& Matrix::operator* (double k) {
 	Matrix *retMat = new Matrix(col,row);
-	for(int i=0; i<col; i++){
-		for(int j=0; j<row; j++){
-			retMat->mat[i][j] =mat[i][j]*k;
-		}
-	}
+	operateLoop(retMat,k,"*");
 	return *retMat;
 }
 Matrix& Matrix::operator/ (double k) {
 	Matrix *retMat = new Matrix(col,row);
-	for(int i=0; i<col; i++){
-		for(int j=0; j<row; j++){
-			retMat->mat[i][j] = mat[i][j]/k;
-		}
-	}
+	operateLoop(retMat,k,"/");
 	return *retMat;
 }
+
 Matrix& Matrix::operator-(){
 	Matrix *retMat = new Matrix(col,row);
 	for(int i=0; i<col; i++){
@@ -480,6 +511,7 @@ Matrix& Matrix::operator= (const Matrix& right){
 	}
 	return *this;
 }
+
 
 bool operator== (const Matrix left, const Matrix right){
 	assert(left.row == right.row && left.col==right.col,"size must be same");
@@ -505,6 +537,8 @@ bool operator!= (const Matrix left, const Matrix right){
 	}
 	return false;
 }
+
+
 
 double& Matrix::operator()(Index l,Index m){
 	
@@ -620,6 +654,7 @@ ostream& operator<<(ostream& os, const Matrix& right)
 	}
     return os;
 }
+
 
 // getter, setter
 int Matrix::getCol(){

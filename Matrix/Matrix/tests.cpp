@@ -1,7 +1,13 @@
 /* Reference : 
  * Definition : http://matrix.skku.ac.kr/sglee/linear/ocu/thm.html
  * Gaussian Elimination : http://matrix.skku.ac.kr/sglee/linear/ocu/20104.html
- * 
+ * 2016.01.21 TODO :1. determinant 성능 개선
+ *					2. 오버로드된 오퍼레이터들에 const 붙여야되는것들 붙이기
+ *					3. << left값 안바뀌게
+ *					4. value test 들 붙이기
+ *					5. Vector로의 확장
+ *					6. interpreter 로 인터페이스 확장 (Parser)
+ *					7. Exception class 만들어붙이기
  */
 
 
@@ -10,8 +16,8 @@
 #include <gtest\gtest.h>
 #include "Matrix.h"
 
-const int INVERSE_MAX_SIZE = 6;
-const int GAUSSIAN_INVERSE_MAX_SIZE = 300;
+const int INVERSE_MAX_SIZE = 4;
+const int GAUSSIAN_INVERSE_MAX_SIZE = 80;
 
 //typedef int Matrix;
 static Matrix MATRIX;
@@ -54,8 +60,8 @@ TEST(MATRIX_SUB_TEST,CHAINING){
 	EXPECT_EQ(-(-A), A);
 }
 
-// 행렬과 행렬 곱하기
-TEST(MATRIX_MULTIPLY_TEST,ASSOCIATIVE_MULTIPLY){
+// 행렬과 행렬 곱하기 // TODO : Value test
+TEST(MATRIX_MULTIPLY_TEST,ASSOCIATIVE_MULTIPLY){ 
 	EXPECT_EQ(A * (B*C),(A*B) * C);
 }
 TEST(MATRIX_MULTIPLY_TEST,DISTRIBUTION_ADD_MULTIPLY){
@@ -70,7 +76,8 @@ TEST(MATRIX_MULTIPLY_TEST,ASSOCIATIVE_CONSTANT_MULTIPLY){
 	EXPECT_EQ(k * (A*B), A * (k*B));
 }
 
-// 행렬과 상수 더하기
+// 행렬과 상수 더하기 // TODO : Value test
+
 TEST(MATRIX_CONSTANT_ADD_TEST,COMMUATATIVE){
 	EXPECT_EQ(k+A, A+k);
 }
@@ -81,7 +88,7 @@ TEST(MATRIX_CONSTANT_ADD_TEST,SELF){
 	EXPECT_EQ(tmp_A, A+k);
 }
 
-// 행렬과 상수 빼기
+// 행렬과 상수 빼기 // TODO : Value test
 TEST(MATRIX_CONSTANT_SUB_TEST,OTHER_COMMUTATIVE){ 
 	EXPECT_EQ(k-A, -(A-k));
 }
@@ -92,7 +99,7 @@ TEST(MATRIX_CONSTANT_SUB_TEST,SELF){
 	EXPECT_EQ(tmp_A, A-k);
 }
 
-// 행렬과 상수 곱하기
+// 행렬과 상수 곱하기 // TODO : Value test
 TEST(MATRIX_CONSTANT_MULTIPLY_TEST,COMMUATATIVE){
 	EXPECT_EQ(k*A, A*k);
 }
@@ -103,7 +110,7 @@ TEST(MATRIX_CONSTANT_MULTIPLY_TEST,SELF){ // TODO
 	EXPECT_EQ(tmp_A, A*k);
 }
 
-// 행렬과 상수 나누기
+// 행렬과 상수 나누기 // TODO : Value test
 TEST(MATRIX_CONSTANT_DEVIDE_TEST,){		
 	EXPECT_EQ(k*A/k, A);
 }
@@ -134,7 +141,7 @@ TEST(MATRIX_TRANSPOSE_TEST,DISTRIBUTION_FOR_CONSTANT_MULTIPLY){
 }
 
 
-// 특정 원소 수정
+// 특정 원소 수정 // TODO : ACCESSOR test
 TEST(MATRIX_ACCESS_TEST,VALUE){
 	Matrix tmpA("1,2,3;4,5,6;7,8,9");
 	Matrix tmpB("1,2,3;1,5,6;7,4,9");
@@ -179,7 +186,7 @@ TEST(MATRIX_ADJOINT_TEST,INVERSE){ // 정리 21
 
 // 행렬식 테스트
 TEST(MATRIX_DETERMINENT_TEST,VALUE){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix A("3,0,2;2,0,-2;0,1,1"); // TODO : 따로 위에 정의
 	double result = 10.;
 	EXPECT_EQ(A.det(), result);
 }
@@ -222,7 +229,7 @@ TEST(MATRIX_INVERSE_TEST, DISTRIBUTION_FOR_CONSTANT){
 	EXPECT_EQ( (k*A).inv(), 1/k*A.inv());
 }
 TEST(MATRIX_INVERSE_TEST, IDENTITY){
-	Matrix A = MATRIX.Rands(3);
+	Matrix A = MATRIX.Rands(3); // TODO : 둘이 다른지, 사이즈가 원하는대로 만들어졌는지
 	EXPECT_EQ( A.inv() * A, MATRIX.Eyes(3));
 }
 
@@ -253,7 +260,7 @@ TEST(MATRIX_REPLACE_ROW_TEST, REPLACE_ROW_WITH_MATRIX){
 	EXPECT_EQ(A,B);
 }
 
-// 행렬 이어붙이기 
+// 행렬 이어붙이기  // TODO : rvalue 로  
 TEST(MATRIX_CONCATENATE_TEST,OPERATOR){
 	A<<B;
 	Matrix C("1,2,2,3;3,4,4,5");
@@ -263,7 +270,7 @@ TEST(MATRIX_CONCATENATE_TEST,OPERATOR){
 // 가우스 소거법
 TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,PROCESS){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
-	A.gaussianElimination();
+	A.makeRREF();
 	EXPECT_EQ(A,MATRIX.Eyes(3));
 }
 TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,INVERSE_MATRIX_USING_GAUSSIAN_ELIMINATE){
@@ -271,7 +278,7 @@ TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,INVERSE_MATRIX_USING_GAUSSIAN_ELIMINATE){
 	Matrix B("3,0,2;2,0,-2;0,1,1");
 	A<<MATRIX.Eyes(3);
 	
-	EXPECT_EQ( A.gaussianElimination() , (MATRIX.Eyes(3)<<(B.inv())) );
+	EXPECT_EQ( A.makeRREF() , (MATRIX.Eyes(3)<<(B.inv())) );
 }
 
 // 랭크
@@ -297,12 +304,12 @@ TEST(MATRIX_SLICE_TEST,VALUE){
 }
 
 // 가우스 소거법을 이용한 역행렬
-TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TSET,VALUE){
+TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TEST,VALUE){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
 	EXPECT_EQ(A.gaussianInv(), A.inv());
 }
 
-TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TSET,LARGE){
+TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TEST,LARGE){
 	Matrix A = MATRIX.Rands(GAUSSIAN_INVERSE_MAX_SIZE);
 	EXPECT_TRUE (A.gaussianInv()!=A);
 }
