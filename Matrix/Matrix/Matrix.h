@@ -25,7 +25,7 @@ public:
 
 	// Constructors
 	Matrix();
-	Matrix(int n);
+	explicit  Matrix(int n);
 	Matrix(int l,int m);
 	Matrix(string sentence);
 
@@ -46,6 +46,8 @@ public:
 	double cofactor(Index l, Index m);		// cofactor;
 	Matrix& adjoint();		// adjoint matrix
 	Matrix& minor();		// minor matrix
+	Matrix& replace(Index firstRow,Index secondRow);
+	Matrix& replace(Index detRow,const Matrix& srcMat);
 
 	// operator overload
 	Matrix& operator+ (const Matrix& right);
@@ -57,8 +59,6 @@ public:
 	Matrix& operator/ (double k);
 	Matrix& operator- ();
 	Matrix& operator= (const Matrix& right);
-
-
 
 	void operator+= (double k);
 	void operator-= (double k);
@@ -284,6 +284,27 @@ Matrix& Matrix::adjoint(){		// adjoint matrix
 }
 	
 
+Matrix& Matrix::replace(Index firstRow,Index secondRow){
+	assert(firstRow >=1 && secondRow >=1,"Index >=1");
+	
+	double* tmpRowPtr = mat[firstRow-1];
+	mat[firstRow-1] = mat[secondRow-1];
+	mat[secondRow-1] = tmpRowPtr;
+
+	return *this;
+}
+Matrix& Matrix::replace(Index detRow,const Matrix& srcMat){
+	assert(detRow >=1,"Index >=1");
+
+	for(int i=0; i<row; i++){
+		mat[detRow-1][i] = srcMat.mat[0][i];
+	}
+	return *this;
+}
+
+
+
+
 // Operator overloadings
 Matrix& Matrix::operator+ (const Matrix& right) {
 	assert(row==right.row && col==right.col,"ERROR : size must be same");
@@ -401,7 +422,6 @@ double& Matrix::operator()(Index l,Index m){
 	assert(l<=col ,"index <= column");
 	return mat[l-1][m-1];
 }
-
 
 //double& Matrix::operator()(int l,int m){
 //	assert(l>=1 && m >=1 ,"index >= 1");

@@ -231,8 +231,22 @@ TEST(MATRIX_INVERSE_TEST, LARGE_MATRIX){
 TEST(MATRIX_ROWMATRIX_TEST, OPERATOR){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
 	Matrix A3("0,1,1");
+	
 	EXPECT_EQ(A(3),A3);
-
 }
 
+// ¿­ Ä¡È¯
+TEST(MATRIX_REPLACE_ROW_TEST, REPLACE_TWO_ROW_INDEX){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	A.replace(1,3);
+	Matrix B("0,1,1;2,0,-2;3,0,2");
+	EXPECT_EQ(A,B);
+}
+TEST(MATRIX_REPLACE_ROW_TEST, REPLACE_ROW_WITH_MATRIX){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix row("7,7,7");
+	A.replace(2,row);
+	Matrix B("3,0,2;7,7,7;0,1,1");	
+	EXPECT_EQ(A,B);
+}
 #endif
