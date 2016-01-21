@@ -342,7 +342,6 @@ Matrix& Matrix::gaussianElimination(){
 			double devideFactor = mat[i][i] / mat[j][i];
 
 			replace(column, (*this)(i+1) - (*this)(column)*devideFactor);
-//			cout << "-----------------"<<endl<<"devideF : "<<devideFactor<<endl<< *this;
 		}
 	}
 //	cout << *this;
