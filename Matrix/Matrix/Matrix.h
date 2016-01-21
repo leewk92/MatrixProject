@@ -73,7 +73,8 @@ public:
 	
 	//double& operator()(int l,int m);
 	double& operator()(Index l,Index m);
-	
+	Matrix& operator()(Index col);
+
 	//getter, setter
 	int getRow();
 	int getCol();
@@ -408,6 +409,15 @@ double& Matrix::operator()(Index l,Index m){
 //	assert(l<=col ,"index <= column");
 //	return mat[l-1][m-1];
 //}
+
+Matrix& Matrix::operator()(Index col){
+	assert(col >=1 && col <= this->col, "1<= Index <= col ");
+	Matrix *retMat = new Matrix(1,row);
+	for(int i=0; i<row; i++){
+		retMat->mat[0][i] = this->mat[col-1][i];
+	}
+	return *retMat;
+}
 
 
 void Matrix::operator+= (double k){
