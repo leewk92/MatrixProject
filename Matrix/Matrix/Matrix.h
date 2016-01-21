@@ -361,7 +361,7 @@ int Matrix::rank(){
 	return rank;
 }
 
-Matrix& Matrix::slice(Index colStart, Index colEnd, Index rowStart, Index rowEnd){
+Matrix& Matrix::slice(Index colStart,Index rowStart, Index colEnd , Index rowEnd){
 	assert(colStart <= colEnd && rowStart <= rowEnd,"index of end must be equal or larger than index of start");
 	assert(colEnd <= col+1 && rowEnd <= row+1,"index of end must be equal or smaller than size of matrix");
 	assert(colStart >=1 && rowStart >=1 , "Index of start must be equal or larger than 1");
@@ -379,7 +379,7 @@ Matrix& Matrix::gaussianInv(){
 	Matrix* retMat = new Matrix(col,row);
 	Matrix tmp = *this;
 	tmp << Eyes(col);
-	*retMat = tmp.gaussianElimination().slice(1,col, row+1, row*2);
+	*retMat = tmp.gaussianElimination().slice(1,row+1,col,row*2);
 	return *retMat;
 }
 

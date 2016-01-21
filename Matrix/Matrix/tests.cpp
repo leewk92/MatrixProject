@@ -10,6 +10,9 @@
 #include <gtest\gtest.h>
 #include "Matrix.h"
 
+const int INVERSE_MAX_SIZE = 6;
+const int GAUSSIAN_INVERSE_MAX_SIZE = 300;
+
 //typedef int Matrix;
 static Matrix MATRIX;
 
@@ -224,7 +227,7 @@ TEST(MATRIX_INVERSE_TEST, IDENTITY){
 }
 
 TEST(MATRIX_INVERSE_TEST, LARGE_MATRIX){
-	Matrix A = MATRIX.Rands(5);
+	Matrix A = MATRIX.Rands(INVERSE_MAX_SIZE);
 	EXPECT_EQ( A.inv(), A.gaussianInv());
 }
 
@@ -288,7 +291,7 @@ TEST(MATRIX_RANK_TEST,VALUE3){
 // Slice
 TEST(MATRIX_SLICE_TEST,VALUE){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
-	Matrix B = A.slice(1,2,1,2);
+	Matrix B = A.slice(1,1,2,2);
 	Matrix result("3,0;2,0");
 	EXPECT_EQ(B,result);
 }
@@ -300,8 +303,8 @@ TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TSET,VALUE){
 }
 
 TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TSET,LARGE){
-	Matrix A = MATRIX.Rands(300);
-	EXPECT_TRUE (A.gaussianInv());
+	Matrix A = MATRIX.Rands(GAUSSIAN_INVERSE_MAX_SIZE);
+	EXPECT_TRUE (A.gaussianInv()!=A);
 }
 
 
