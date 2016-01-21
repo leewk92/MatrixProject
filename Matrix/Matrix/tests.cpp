@@ -1,5 +1,6 @@
-/* Reference : http://matrix.skku.ac.kr/sglee/linear/ocu/thm.html
- * 
+/* Reference : 
+ * Definition : http://matrix.skku.ac.kr/sglee/linear/ocu/thm.html
+ * Gaussian Elimination : http://matrix.skku.ac.kr/sglee/linear/ocu/20104.html
  * 
  */
 
@@ -262,6 +263,13 @@ TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,PROCESS){
 	A.gaussianElimination();
 	EXPECT_EQ(A,MATRIX.Eyes(3));
 }
+TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,INVERSE_MATRIX_USING_GAUSSIAN_ELIMINATE){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	Matrix B("3,0,2;2,0,-2;0,1,1");
+	A<<MATRIX.Eyes(3);
+	
+	EXPECT_EQ( A.gaussianElimination() , (MATRIX.Eyes(3)<<(B.inv())) );
+}
 
 // ·©Å©
 TEST(MATRIX_RANK_TEST,VALUE1){
@@ -271,6 +279,10 @@ TEST(MATRIX_RANK_TEST,VALUE1){
 TEST(MATRIX_RANK_TEST,VALUE2){
 	Matrix A("1,2;2,4");
 	EXPECT_EQ(A.rank() , 1);
+}
+TEST(MATRIX_RANK_TEST,VALUE3){
+	Matrix A("1,2;2,4;1,3;5,7");
+	EXPECT_EQ(A.rank() , 2);
 }
 
 #endif

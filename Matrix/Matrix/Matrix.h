@@ -308,19 +308,19 @@ Matrix& Matrix::replace(Index detRow,const Matrix& srcMat){
 
 Matrix& Matrix::gaussianElimination(){
 
-	for(int i=0; i<row; i++){
+	for(int i=0; i<col; i++){
 		Index k=2;
 		Index iIndex = i+1;
+	
 		while(mat[i][i] == 0){
 			if(k == col){
 				break;
 			}
 			replace(iIndex, k++); 	
 		}
-		if(mat[i][i] == 0)
+		if(abs(mat[i][i]) < SMALLVAL)
 			continue;
 		double devideFactor = 1 / mat[i][i];
-		cout <<"1 : "<<devideFactor<<endl;
 		replace(iIndex,devideFactor * (*this)(iIndex));
 
 		// 기약형 사다리꼴 행렬(RREF)을 만들기 위한 반복문
@@ -328,18 +328,18 @@ Matrix& Matrix::gaussianElimination(){
 			Index refIndex = ref+1;
 			if(mat[ref][i] != 0){
 				double multiplyFactor =  mat[ref][i];
-					cout <<"2 : "<<multiplyFactor<<endl;
+
 				replace(refIndex, (*this)(refIndex)- multiplyFactor*(*this)(iIndex));
 			}
 		}
 
 		for(int j=i+1; j<col; j++){
 			Index column = j+1;
-			if(mat[j][i] == 0)
+			if(abs(mat[j][i]) <SMALLVAL || abs(mat[i][i]) < 0)
 				continue;
-			double devideFactor = mat[0][i] / mat[j][i];
-			cout <<"3 : "<<devideFactor<<endl;
-			replace(column, (*this)(1) - (*this)(column)*devideFactor);
+			double devideFactor = mat[i][i] / mat[j][i];
+
+			replace(column, (*this)(i+1) - (*this)(column)*devideFactor);
 //			cout << "-----------------"<<endl<<"devideF : "<<devideFactor<<endl<< *this;
 		}
 	}
@@ -585,6 +585,17 @@ ostream& operator<<(ostream& os, const Matrix& right)
 	}
     return os;
 }
+
+// getter, setter
+int Matrix::getCol(){
+
+	return col;
+}
+int Matrix::getRow(){
+	return row;
+}
+
+
 
 
 #endif
