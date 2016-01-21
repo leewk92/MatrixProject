@@ -256,4 +256,21 @@ TEST(MATRIX_CONCATENATE_TEST,OPERATOR){
 	EXPECT_EQ(A,C);
 }
 
+// 啊快胶 家芭过
+TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,PROCESS){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	A.gaussianElimination();
+	EXPECT_EQ(A,MATRIX.Eyes(3));
+}
+
+// 珐农
+TEST(MATRIX_RANK_TEST,VALUE1){
+	Matrix A("3,0,2;2,0,-2;0,1,1");
+	EXPECT_EQ(A.rank() , 3);
+}
+TEST(MATRIX_RANK_TEST,VALUE2){
+	Matrix A("1,2;2,4");
+	EXPECT_EQ(A.rank() , 1);
+}
+
 #endif

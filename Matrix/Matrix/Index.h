@@ -14,6 +14,7 @@ public:
 	Index(const int& index);
     Index& operator= (const int& i) ;	// conversion from int (assignment):
     operator int();	// conversion to int (type-cast operator)
+	Index& operator ++();
 };
 
 Index::Index(){
@@ -29,5 +30,8 @@ Index& Index::operator= (const int& i){
 Index::operator int() {
 	return index;
 }
-
+Index& Index::operator++(){
+	index += 1;
+	return *this;
+}
 #endif
