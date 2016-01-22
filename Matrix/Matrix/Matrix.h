@@ -29,7 +29,7 @@ private:
 	// functions
 	void initializeFunctions();
 	bool makeFirstLeadingEntryNotZero(Index i);
-	int makeOneCommaOneNotZero();
+	int makeNCommaNNotZero(Index n);
 	Matrix& gaussianElimination(bool isRREF) const ;	// ifRREF is false then it makes REF
 	Matrix* operateLoop(Matrix* detMat, const Matrix& right, string _operator) const;
 	Matrix* operateLoop(Matrix* detMat, double k , string _operator) const;
@@ -69,7 +69,8 @@ public:
 	int rank() const;
 	Matrix& slice(Index colStart, Index colEnd, Index rowStart, Index rowEnd) const;
 	Matrix& gaussianInv() const;			// inverse by using gaussian elimination
-	Matrix& elementaryRowOperation() const;
+	Matrix& elementaryRowOperationInv() const;			
+	Matrix& elementaryRowOperation(int &changeNum) const;
 	double elementaryRowOperationDet() const;
 
 	// operator overload
@@ -248,8 +249,11 @@ Matrix& Matrix::T() const {
 
 Matrix& Matrix::inv() const {			// inverse 
 	assert(row == col , "row and col number must be same for calculating inverse matrix");
-	assert(det() != 0 , "determinant must not be zero for obtaining inverse matrix");
-	return 1./det() * adjoint();
+//	assert(det() != 0 , "determinant must not be zero for obtaining inverse matrix");
+//	return 1./det() * adjoint();
+	assert(elementaryRowOperationDet() != 0 , "determinant must not be zero for obtaining inverse matrix");
+	return 1./elementaryRowOperationDet() * adjoint();
+	
 }
 double Matrix::det() const {			// determinent
 	double retVal = 0.;
@@ -298,8 +302,8 @@ double Matrix::cofactor(Index l, Index m) const {
 		}
 		colIndex++;
 	}
-	double retVal= tmpMat.det();
-	
+	//double retVal= tmpMat.det();								// original ver
+	double retVal= tmpMat.elementaryRowOperationDet();			// new ver
 	if((l+m) %2 != 0){
 		retVal = retVal* (-1);
 	}
@@ -377,14 +381,11 @@ Matrix& Matrix::gaussianElimination(bool isRREF) const{
 
 Matrix& Matrix::REF() const{
 	
-	//Matrix *retMat = new Matrix(gaussianElimination(false));
-	//return *retMat;
 	return gaussianElimination(false);
 }
 
 Matrix& Matrix::RREF() const{
-	//Matrix *retMat = new Matrix(gaussianElimination(true));
-	//return *retMat;
+
 	return gaussianElimination(true);
 }
 
@@ -464,29 +465,43 @@ Matrix* Matrix::operateLoop(Matrix* detMat, double k , string _operator) const{
 	return detMat;
 }
 
-int Matrix::makeOneCommaOneNotZero() {
-	Index k=2;
+int Matrix::makeNCommaNNotZero(Index n) {
+	Index k=n+1;
 	int changeNum=0;
-	while(mat[0][0] == 0){
-		if(k == col){
-			break;
+	while(mat[n-1][n-1] == 0){
+		if(k == n){
+			continue;
 		}
-		replace(0, k++); 
+		if(k == col+1)
+			k = 1;
+
+		replace(n, k); 
+		k++;
 		changeNum++;
+		break;
 	}
 	return changeNum;
 }
 
-Matrix& Matrix::elementaryRowOperation() const{
+Matrix& Matrix::elementaryRowOperation(int &changeNum) const{
 
 	Matrix *retMat = new Matrix(*this);
-	int changeNum = retMat->makeOneCommaOneNotZero();
+	
 	for(int i=0; i<col; i++){
+		
+		Index n = i+1;
+		changeNum += retMat->makeNCommaNNotZero(n);
+//		if(changeNum ==col-1)
+//			continue;
 		for(int j=i+1; j<col; j++){
+
+			if(retMat->mat[j][i] == 0 ) continue;
 			double devideFactor = retMat->mat[i][i]/ retMat->mat[j][i] ;
 			retMat->replace(j+1, (*retMat)(j+1) - (*retMat)(i+1)/devideFactor ) ;
 		}
 	}
+//	if(changeNum %2 == 1) (*retMat)(1,1)*(-1);
+
 	return *retMat;
 }
 
@@ -494,12 +509,11 @@ double Matrix::elementaryRowOperationDet() const {			// determinent
 	double retVal = 1.;
 	assert(row == col , "row and col number must be same for calculating determindet");
 	Matrix tmp = Matrix(*this);
-
-	int changeNum = tmp.makeOneCommaOneNotZero();
-
-	Matrix ero = Matrix(elementaryRowOperation());
+	int changeNum =0;
+	
+	Matrix resultMat = Matrix(tmp.elementaryRowOperation(changeNum));
 	for(Index i=1; i<=row; i++){
-		retVal *= ero(i,i);
+		retVal *= resultMat(i,i);
 	}
 	
 	if(changeNum %2 == 1)
@@ -508,10 +522,10 @@ double Matrix::elementaryRowOperationDet() const {			// determinent
 	return retVal;
 }
 
+Matrix& Matrix::elementaryRowOperationInv() const {
 
-
-
-
+	return Matrix(1);
+}
 
 
 // Operator overloadings

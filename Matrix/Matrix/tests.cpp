@@ -1,7 +1,7 @@
 /* Reference : 
  * Definition : http://matrix.skku.ac.kr/sglee/linear/ocu/thm.html
  * Gaussian Elimination : http://matrix.skku.ac.kr/sglee/linear/ocu/20104.html
- * 2016.01.21 TODO :1. determinant 성능 개선
+ * 2016.01.21 TODO :1. determinant 성능 개선 v
  *					2. 오버로드된 오퍼레이터들에 const 붙여야되는것들 붙이기 v
  *					3. << left값 안바뀌게 v 
  *					4. value test 들 붙이기 v
@@ -16,9 +16,9 @@
 #include <gtest\gtest.h>
 #include "Matrix.h"
 
-const int INVERSE_MAX_SIZE = 4;
+const int INVERSE_MAX_SIZE = 10;
 const int GAUSSIAN_INVERSE_MAX_SIZE = 40;
-
+const int DET_ELEMENTARY_ROW_OPERATION_MAX_SIZE = 160;
 //typedef int Matrix;
 static Matrix MATRIX;
 
@@ -273,7 +273,7 @@ TEST(MATRIX_INVERSE_TEST, IDENTITY){
 
 TEST(MATRIX_INVERSE_TEST, LARGE_MATRIX){
 	Matrix A = MATRIX.Rands(INVERSE_MAX_SIZE);
-	EXPECT_EQ( A.inv(), A.gaussianInv());
+	EXPECT_TRUE( A.inv() != A);
 }
 
 // 열 구하기
@@ -372,19 +372,19 @@ TEST(TRIANGULAR_DETERMINANT,VALUE2){
 
 TEST(TRIANGULAR_DETERMINANT,VALUE4){
 	Matrix tmpA("1,7,2,5;2,4,3,6;5,4,2,9;3,3,1,2");
-	cout << "1.det : " << tmpA.det()<<endl;
+
 	EXPECT_DOUBLE_EQ(tmpA.det(),1*-10*-4.9*(-5.8+3.2/4.9*3.6));
 }
 TEST(TRIANGULAR_DETERMINANT,VALUE5){
 	Matrix tmpA("2,4,3,6;1,7,2,5;5,4,2,9;3,3,1,2");
-	cout << "2.det : " <<tmpA.det()<<endl;
+
 	EXPECT_DOUBLE_EQ(tmpA.det(),-49*(-5.8+3.6/4.9*3.2));
 }
 
 // elementaryRowOperation
 TEST(ELEMENTARY_ROW_OPERATION_TEST,VALUE){
 	Matrix tmpA("2,4,3,6;1,7,2,5;5,4,2,9;3,3,1,2");
-	cout << tmpA.elementaryRowOperation();
+	
 	EXPECT_DOUBLE_EQ(tmpA.det(),-49*(-5.8+3.6/4.9*3.2));
 }
 
@@ -403,4 +403,22 @@ TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,VALUE3){
 
 	EXPECT_DOUBLE_EQ(A3.det(), A3.elementaryRowOperationDet());
 }
+
+
+TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,LARGE){
+
+	Matrix rand = MATRIX.Rands(DET_ELEMENTARY_ROW_OPERATION_MAX_SIZE);
+
+	EXPECT_TRUE(rand.elementaryRowOperationDet()!=1);
+}
+
+TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,COMPARE){
+
+	Matrix rand = MATRIX.Rands(DET_ELEMENTARY_ROW_OPERATION_MAX_SIZE/10);
+
+	EXPECT_TRUE(rand.det()!=1);
+}
+
+
+
 #endif
