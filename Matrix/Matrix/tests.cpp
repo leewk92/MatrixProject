@@ -4,7 +4,7 @@
  * 2016.01.21 TODO :1. determinant 성능 개선
  *					2. 오버로드된 오퍼레이터들에 const 붙여야되는것들 붙이기 v
  *					3. << left값 안바뀌게 v 
- *					4. value test 들 붙이기
+ *					4. value test 들 붙이기 v
  *					5. Vector로의 확장
  *					6. interpreter 로 인터페이스 확장 (Parser)
  *					7. Exception class 만들어붙이기
@@ -31,7 +31,7 @@ Matrix B = Matrix("2,3;4,5");
 Matrix C = Matrix("3,4;5,6");
 
 Matrix A3 = Matrix("3,0,2;2,0,-2;0,1,1");
-
+Matrix B3 = Matrix("1,2,6;3,4,5;1,0,5");
 
 
 // 행렬 더하기
@@ -169,8 +169,13 @@ TEST(MATRIX_TRANSPOSE_TEST,DISTRIBUTION_FOR_CONSTANT_MULTIPLY){
 }
 
 
-// 특정 원소 수정 // TODO : ACCESSOR test
-TEST(MATRIX_ACCESS_TEST,VALUE){
+// 특정 원소 수정 
+TEST(MATRIX_SPECIFIC_TEST,ACCESSOR){
+	
+	EXPECT_EQ(A(1,2),2);
+}
+
+TEST(MATRIX_SPECIFIC_TEST,MUTATOR){
 	Matrix tmpA("1,2,3;4,5,6;7,8,9");
 	Matrix tmpB("1,2,3;1,5,6;7,4,9");
 	tmpA(2,1) = 1;
@@ -195,71 +200,71 @@ TEST(MATRIX_EYES_TEST,COMMUTATIVE){
 // 소행렬 테스트
 TEST(MATRIX_MINOR_TEST,VALUE){
 
-	Matrix A("3,0,2;2,0,-2;0,1,1");
 	Matrix result("2,2,2;-2,3,3;0,-10,0");
 
-	EXPECT_EQ(A.minor(), result);
+	EXPECT_EQ(A3.minor(), result);
 }
 
 // 수반행렬 테스트
 TEST(MATRIX_ADJOINT_TEST,VALUE){
 
-	Matrix A("3,0,2;2,0,-2;0,1,1");
 	Matrix result("2,2,0;-2,3,10;2,-3,0");
 
-	EXPECT_EQ(A.adjoint(), result);
+	EXPECT_EQ(A3.adjoint(), result);
 }
 TEST(MATRIX_ADJOINT_TEST,INVERSE){ // 정리 21
 
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	
-	EXPECT_EQ(A.inv(), 1/A.det()*A.adjoint());
+	//EXPECT_EQ(A.inv(), 1/A.det()*A.adjoint());
+	EXPECT_EQ(A3.inv(), 1/A3.det()*A3.adjoint());
 }
 
 
 // 행렬식 테스트
 TEST(MATRIX_DETERMINENT_TEST,VALUE){
-	Matrix A("3,0,2;2,0,-2;0,1,1"); // TODO : 따로 위에 정의
-	double result = 10.;
-	EXPECT_EQ(A.det(), result);
+	double A3_det_result = 10.;
+	EXPECT_DOUBLE_EQ(A3.det(), A3_det_result);
 }
 TEST(MATRIX_DETERMINENT_TEST,TRANSPOSE){ //정리 11
-	//Matrix A("3,0,2;2,0,-2;0,1,1");
-	EXPECT_EQ(A.det(), A.T().det());
+	EXPECT_DOUBLE_EQ(A.det(), A.T().det());
+	//EXPECT_DOUBLE_EQ(A3.det(), A3.T().det());
 }
 TEST(MATRIX_DETERMINENT_TEST,DISTRIBUTION_FOR_MULTIPLY){ // 정리 18
-	//Matrix A("3,0,2;2,0,-2;0,1,1");
-	//Matrix B("1,2,6;3,4,5;1,0,5");
-	EXPECT_EQ( (A*B).det() , A.det() * B.det() );
+
+	EXPECT_DOUBLE_EQ( (A*B).det() , A.det() * B.det() );
+	EXPECT_DOUBLE_EQ( (A3*B3).det() , A3.det() * B3.det() );
 }
 TEST(MATRIX_DETERMINENT_TEST,REVERSE_FOR_INVERSE){ // 정리 18
-	//Matrix A("3,0,2;2,0,-2;0,1,1");
-	EXPECT_EQ( (A.inv()).det() , 1/A.det() );
+
+	EXPECT_DOUBLE_EQ( (A.inv()).det() , 1/A.det() );
+	EXPECT_DOUBLE_EQ( (A3.inv()).det() , 1/A3.det() );
 }
 
 
 // 역행렬 테스트 : 정리 7
 TEST(MATRIX_INVERSE_TEST,VALUE){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	Matrix result("0.2,0.2,0;-0.2,0.3,1;0.2,-0.3,0");
-	EXPECT_EQ(A.inv(), result);
+	Matrix A3_Inv_result("0.2,0.2,0;-0.2,0.3,1;0.2,-0.3,0");
+	EXPECT_EQ(A3.inv(), A3_Inv_result);
 }
 TEST(MATRIX_INVERSE_TEST,CHAINING){
 	//Matrix A("3,0,2;2,0,-2;0,1,1");
 	EXPECT_EQ(A.inv().inv(), A);
+	//EXPECT_EQ(A3.inv().inv(), A3);
 }
 TEST(MATRIX_INVERSE_TEST,REVERSE){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	Matrix B("1,2,6;3,4,5;1,0,5");
+	//Matrix A("3,0,2;2,0,-2;0,1,1");
+	//Matrix B("1,2,6;3,4,5;1,0,5");
 	EXPECT_EQ( (A*B).inv(), B.inv() * A.inv() );
+	EXPECT_EQ( (A3*B3).inv(), B3.inv() * A3.inv() );
 }
 TEST(MATRIX_INVERSE_TEST, COMMUTATIVE_FOR_TRANSPOSE){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
+
 	EXPECT_EQ( (A.T()).inv(), (A.inv()).T());
+	EXPECT_EQ( (A3.T()).inv(), (A3.inv()).T());
 }
 TEST(MATRIX_INVERSE_TEST, DISTRIBUTION_FOR_CONSTANT){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
+
 	EXPECT_EQ( (k*A).inv(), 1/k*A.inv());
+	EXPECT_EQ( (k*A3).inv(), 1/k*A3.inv());
 }
 TEST(MATRIX_INVERSE_TEST, IDENTITY){
 	Matrix A = MATRIX.Rands(3); // TODO : 둘이 다른지, 사이즈가 원하는대로 만들어졌는지
@@ -272,10 +277,10 @@ TEST(MATRIX_INVERSE_TEST, LARGE_MATRIX){
 }
 
 // 열 구하기
-TEST(MATRIX_ROWMATRIX_TEST, OPERATOR){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	Matrix A3("0,1,1");
-	EXPECT_EQ(A(3),A3);
+TEST(MATRIX_ROWMATRIX_TEST, VALUE){
+
+	Matrix ThirdRowOfA("0,1,1");
+	EXPECT_EQ(A3(3),ThirdRowOfA);
 }
 
 // 열 치환
@@ -295,57 +300,57 @@ TEST(MATRIX_REPLACE_ROW_TEST, REPLACE_ROW_WITH_MATRIX){
 
 // 행렬 이어붙이기  // TODO : rvalue 로  
 TEST(MATRIX_CONCATENATE_TEST,OPERATOR){
-	A = A<<B;
+	Matrix tmpA = A<<B;
 	Matrix C("1,2,2,3;3,4,4,5");
-	EXPECT_EQ(A,C);
+	EXPECT_EQ(tmpA,C);
 }
 
 // 가우스 소거법
 TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,PROCESS){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	Matrix rref = A.RREF();
+	Matrix rref = A3.RREF();
 	EXPECT_EQ(rref,MATRIX.Eyes(3));
 }
 TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,INVERSE_MATRIX_USING_GAUSSIAN_ELIMINATE){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	Matrix B("3,0,2;2,0,-2;0,1,1");
-	A = A<<MATRIX.Eyes(3);
-	
-	EXPECT_EQ( A.RREF() , (MATRIX.Eyes(3)<<(B.inv())) );
+	cout << A3;
+	Matrix tmpA3 = A3<<MATRIX.Eyes(3);
+	cout << endl<<tmpA3.RREF();
+	EXPECT_EQ( tmpA3.RREF() , (MATRIX.Eyes(3)<<(A3.inv())) );
 }
 
 // 랭크
 TEST(MATRIX_RANK_TEST,VALUE1){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	EXPECT_EQ(A.rank() , 3);
+
+	EXPECT_EQ(A3.rank() , 3);
 }
 TEST(MATRIX_RANK_TEST,VALUE2){
-	Matrix A("1,2;2,4");
-	EXPECT_EQ(A.rank() , 1);
+	Matrix tmpA("1,2;2,4");
+	EXPECT_EQ(tmpA.rank() , 1);
 }
 TEST(MATRIX_RANK_TEST,VALUE3){
-	Matrix A("1,2;2,4;1,3;5,7");
-	EXPECT_EQ(A.rank() , 2);
+	Matrix tmpA("1,2;2,4;1,3;5,7");
+	EXPECT_EQ(tmpA.rank() , 2);
 }
 
 // Slice
 TEST(MATRIX_SLICE_TEST,VALUE){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
-	Matrix B = A.slice(1,1,2,2);
+
+	Matrix tmpA3 = A3.slice(1,1,2,2);
 	Matrix result("3,0;2,0");
-	EXPECT_EQ(B,result);
+	EXPECT_EQ(tmpA3,result);
 }
 
 // 가우스 소거법을 이용한 역행렬
 TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TEST,VALUE){
-	Matrix A("3,0,2;2,0,-2;0,1,1");
+
 	EXPECT_EQ(A.gaussianInv(), A.inv());
+	//EXPECT_EQ(A3.gaussianInv(), A3.inv());
 }
 
 TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TEST,LARGE){
-	Matrix A = MATRIX.Rands(GAUSSIAN_INVERSE_MAX_SIZE);
-	EXPECT_TRUE (A.gaussianInv()!=A);
+	Matrix tmpA = MATRIX.Rands(GAUSSIAN_INVERSE_MAX_SIZE);
+	EXPECT_TRUE (tmpA.gaussianInv()!=tmpA);
 }
+
 
 
 #endif
