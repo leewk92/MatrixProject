@@ -17,7 +17,7 @@
 #include "Matrix.h"
 
 const int INVERSE_MAX_SIZE = 4;
-const int GAUSSIAN_INVERSE_MAX_SIZE = 80;
+const int GAUSSIAN_INVERSE_MAX_SIZE = 40;
 
 //typedef int Matrix;
 static Matrix MATRIX;
@@ -351,6 +351,56 @@ TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TEST,LARGE){
 	EXPECT_TRUE (tmpA.gaussianInv()!=tmpA);
 }
 
+TEST(LU_DECOMPOSITION,MULTIPY){
+	Matrix tmpA("4,3;6,3");
+	Matrix tmpB("1,0;1.5,1");
+	Matrix tmpC("4,3;0,-1.5");
+	EXPECT_EQ(tmpA.det(),tmpB.det() * tmpC.det());
+}
 
 
+TEST(TRIANGULAR_DETERMINANT,VALUE){
+	Matrix tmpA("3,5,6;0,6,4;0,0,4");
+
+	EXPECT_EQ(tmpA.det(),4*6*3);
+}
+TEST(TRIANGULAR_DETERMINANT,VALUE2){
+	Matrix tmpA("1,-5,6,-3;3,-1,1,-2;4,-5,4,-5;3,-4,-3,-6");
+
+	EXPECT_EQ(tmpA.det(),1*7*3*3/7);
+}
+
+TEST(TRIANGULAR_DETERMINANT,VALUE4){
+	Matrix tmpA("1,7,2,5;2,4,3,6;5,4,2,9;3,3,1,2");
+	cout << "1.det : " << tmpA.det()<<endl;
+	EXPECT_DOUBLE_EQ(tmpA.det(),1*-10*-4.9*(-5.8+3.2/4.9*3.6));
+}
+TEST(TRIANGULAR_DETERMINANT,VALUE5){
+	Matrix tmpA("2,4,3,6;1,7,2,5;5,4,2,9;3,3,1,2");
+	cout << "2.det : " <<tmpA.det()<<endl;
+	EXPECT_DOUBLE_EQ(tmpA.det(),-49*(-5.8+3.6/4.9*3.2));
+}
+
+// elementaryRowOperation
+TEST(ELEMENTARY_ROW_OPERATION_TEST,VALUE){
+	Matrix tmpA("2,4,3,6;1,7,2,5;5,4,2,9;3,3,1,2");
+	cout << tmpA.elementaryRowOperation();
+	EXPECT_DOUBLE_EQ(tmpA.det(),-49*(-5.8+3.6/4.9*3.2));
+}
+
+// За·ДЅД using elementaryRowOperation
+TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,VALUE1){
+	Matrix tmpA("2,4,3,6;1,7,2,5;5,4,2,9;3,3,1,2");
+	EXPECT_DOUBLE_EQ(tmpA.det(), tmpA.elementaryRowOperationDet());
+}
+
+TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,VALUE2){
+	
+	EXPECT_DOUBLE_EQ(A.det(), A.elementaryRowOperationDet());
+}
+
+TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,VALUE3){
+
+	EXPECT_DOUBLE_EQ(A3.det(), A3.elementaryRowOperationDet());
+}
 #endif

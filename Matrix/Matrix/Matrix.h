@@ -29,6 +29,7 @@ private:
 	// functions
 	void initializeFunctions();
 	bool makeFirstLeadingEntryNotZero(Index i);
+	int makeOneCommaOneNotZero();
 	Matrix& gaussianElimination(bool isRREF) const ;	// ifRREF is false then it makes REF
 	Matrix* operateLoop(Matrix* detMat, const Matrix& right, string _operator) const;
 	Matrix* operateLoop(Matrix* detMat, double k , string _operator) const;
@@ -68,7 +69,8 @@ public:
 	int rank() const;
 	Matrix& slice(Index colStart, Index colEnd, Index rowStart, Index rowEnd) const;
 	Matrix& gaussianInv() const;			// inverse by using gaussian elimination
-	
+	Matrix& elementaryRowOperation() const;
+	double elementaryRowOperationDet() const;
 
 	// operator overload
 	Matrix& operator+ (const Matrix& right) const;
@@ -268,6 +270,8 @@ double Matrix::det() const {			// determinent
 	return retVal;
 }
 
+
+
 Matrix& Matrix::minor() const{
 	assert(row == col , "row and col number must be same for calculating minor matrix");
 	Matrix* retMat = new Matrix(col,row);
@@ -459,6 +463,55 @@ Matrix* Matrix::operateLoop(Matrix* detMat, double k , string _operator) const{
 	}	
 	return detMat;
 }
+
+int Matrix::makeOneCommaOneNotZero() {
+	Index k=2;
+	int changeNum=0;
+	while(mat[0][0] == 0){
+		if(k == col){
+			break;
+		}
+		replace(0, k++); 
+		changeNum++;
+	}
+	return changeNum;
+}
+
+Matrix& Matrix::elementaryRowOperation() const{
+
+	Matrix *retMat = new Matrix(*this);
+	int changeNum = retMat->makeOneCommaOneNotZero();
+	for(int i=0; i<col; i++){
+		for(int j=i+1; j<col; j++){
+			double devideFactor = retMat->mat[i][i]/ retMat->mat[j][i] ;
+			retMat->replace(j+1, (*retMat)(j+1) - (*retMat)(i+1)/devideFactor ) ;
+		}
+	}
+	return *retMat;
+}
+
+double Matrix::elementaryRowOperationDet() const {			// determinent
+	double retVal = 1.;
+	assert(row == col , "row and col number must be same for calculating determindet");
+	Matrix tmp = Matrix(*this);
+
+	int changeNum = tmp.makeOneCommaOneNotZero();
+
+	Matrix ero = Matrix(elementaryRowOperation());
+	for(Index i=1; i<=row; i++){
+		retVal *= ero(i,i);
+	}
+	
+	if(changeNum %2 == 1)
+		retVal *= -1;
+
+	return retVal;
+}
+
+
+
+
+
 
 
 // Operator overloadings
