@@ -3,7 +3,7 @@
  * Gaussian Elimination : http://matrix.skku.ac.kr/sglee/linear/ocu/20104.html
  * 2016.01.21 TODO :1. determinant 성능 개선
  *					2. 오버로드된 오퍼레이터들에 const 붙여야되는것들 붙이기 v
- *					3. << left값 안바뀌게
+ *					3. << left값 안바뀌게 v 
  *					4. value test 들 붙이기
  *					5. Vector로의 확장
  *					6. interpreter 로 인터페이스 확장 (Parser)
@@ -29,6 +29,9 @@ double k = 2.;
 Matrix A = Matrix("1,2;3,4");
 Matrix B = Matrix("2,3;4,5");
 Matrix C = Matrix("3,4;5,6");
+
+Matrix A3 = Matrix("3,0,2;2,0,-2;0,1,1");
+
 
 
 // 행렬 더하기
@@ -56,11 +59,20 @@ TEST(MATRIX_ADD_TEST,INVERSE_ELEMENT){
 }
 
 // 행렬 빼기
+TEST(MATRIX_SUB_TEST,Value){ 
+	Matrix Result = Matrix("-1 ,-1;-1,-1");
+	EXPECT_EQ(A-B,Result );
+}
 TEST(MATRIX_SUB_TEST,CHAINING){ 
 	EXPECT_EQ(-(-A), A);
 }
 
-// 행렬과 행렬 곱하기 // TODO : Value test
+// 행렬과 행렬 곱하기 
+TEST(MATRIX_MULTIPLY_TEST,VALUE){ 
+	Matrix Result = Matrix("10,13;22,29");
+	EXPECT_EQ(A * B,Result);
+}
+
 TEST(MATRIX_MULTIPLY_TEST,ASSOCIATIVE_MULTIPLY){ 
 	EXPECT_EQ(A * (B*C),(A*B) * C);
 }
@@ -76,7 +88,11 @@ TEST(MATRIX_MULTIPLY_TEST,ASSOCIATIVE_CONSTANT_MULTIPLY){
 	EXPECT_EQ(k * (A*B), A * (k*B));
 }
 
-// 행렬과 상수 더하기 // TODO : Value test
+// 행렬과 상수 더하기 
+TEST(MATRIX_CONSTANT_ADD_TEST,VALUE1){
+	Matrix Result = Matrix("3,4;5,6");
+	EXPECT_EQ(k+A,Result);
+}
 
 TEST(MATRIX_CONSTANT_ADD_TEST,COMMUATATIVE){
 	EXPECT_EQ(k+A, A+k);
@@ -88,7 +104,11 @@ TEST(MATRIX_CONSTANT_ADD_TEST,SELF){
 	EXPECT_EQ(tmp_A, A+k);
 }
 
-// 행렬과 상수 빼기 // TODO : Value test
+// 행렬과 상수 빼기
+TEST(MATRIX_CONSTANT_SUB_TEST,VALUE){ 
+	Matrix Result = Matrix("-1,0;1,2");
+	EXPECT_EQ(A-k, Result);
+}
 TEST(MATRIX_CONSTANT_SUB_TEST,OTHER_COMMUTATIVE){ 
 	EXPECT_EQ(k-A, -(A-k));
 }
@@ -99,19 +119,27 @@ TEST(MATRIX_CONSTANT_SUB_TEST,SELF){
 	EXPECT_EQ(tmp_A, A-k);
 }
 
-// 행렬과 상수 곱하기 // TODO : Value test
+// 행렬과 상수 곱하기 
+TEST(MATRIX_CONSTANT_MULTIPLY_TEST,VALUE){
+	Matrix Result = Matrix("2,4;6,8");
+	EXPECT_EQ(k*A, Result);
+}
 TEST(MATRIX_CONSTANT_MULTIPLY_TEST,COMMUATATIVE){
 	EXPECT_EQ(k*A, A*k);
 }
-TEST(MATRIX_CONSTANT_MULTIPLY_TEST,SELF){ // TODO
+TEST(MATRIX_CONSTANT_MULTIPLY_TEST,SELF){ 
 	Matrix tmp_A;
 	tmp_A = A;
 	tmp_A *=k;
 	EXPECT_EQ(tmp_A, A*k);
 }
 
-// 행렬과 상수 나누기 // TODO : Value test
-TEST(MATRIX_CONSTANT_DEVIDE_TEST,){		
+// 행렬과 상수 나누기 
+TEST(MATRIX_CONSTANT_DEVIDE_TEST,VALUE){	
+	Matrix Result("0.5,1;1.5,2");
+	EXPECT_EQ(A/k, Result);
+}
+TEST(MATRIX_CONSTANT_DEVIDE_TEST,COMMUTATIVE){		
 	EXPECT_EQ(k*A/k, A);
 }
 TEST(MATRIX_CONSTANT_DEVIDE_TEST,SELF){ // TODO
@@ -152,6 +180,11 @@ TEST(MATRIX_ACCESS_TEST,VALUE){
 }
 
 // 단위행렬 테스트
+TEST(MATRIX_EYES_TEST,VALUE){
+	Matrix Eyes4 = MATRIX.Eyes(4);
+	Matrix Result("1,0,0,0;0,1,0,0;0,0,1,0;0,0,0,1");
+	EXPECT_EQ(Eyes4,Result);
+}
 TEST(MATRIX_EYES_TEST,IDENTITY){
 	EXPECT_EQ(A,A*Eyes);
 }
