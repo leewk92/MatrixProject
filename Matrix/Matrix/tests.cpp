@@ -2,7 +2,7 @@
  * Definition : http://matrix.skku.ac.kr/sglee/linear/ocu/thm.html
  * Gaussian Elimination : http://matrix.skku.ac.kr/sglee/linear/ocu/20104.html
  * 2016.01.21 TODO :1. determinant 성능 개선
- *					2. 오버로드된 오퍼레이터들에 const 붙여야되는것들 붙이기
+ *					2. 오버로드된 오퍼레이터들에 const 붙여야되는것들 붙이기 v
  *					3. << left값 안바뀌게
  *					4. value test 들 붙이기
  *					5. Vector로의 확장
@@ -262,7 +262,7 @@ TEST(MATRIX_REPLACE_ROW_TEST, REPLACE_ROW_WITH_MATRIX){
 
 // 행렬 이어붙이기  // TODO : rvalue 로  
 TEST(MATRIX_CONCATENATE_TEST,OPERATOR){
-	A<<B;
+	A = A<<B;
 	Matrix C("1,2,2,3;3,4,4,5");
 	EXPECT_EQ(A,C);
 }
@@ -270,15 +270,15 @@ TEST(MATRIX_CONCATENATE_TEST,OPERATOR){
 // 가우스 소거법
 TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,PROCESS){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
-	A.makeRREF();
-	EXPECT_EQ(A,MATRIX.Eyes(3));
+	Matrix rref = A.RREF();
+	EXPECT_EQ(rref,MATRIX.Eyes(3));
 }
 TEST(MATRIX_GAUSSIAN_ELIMINATE_TEST,INVERSE_MATRIX_USING_GAUSSIAN_ELIMINATE){
 	Matrix A("3,0,2;2,0,-2;0,1,1");
 	Matrix B("3,0,2;2,0,-2;0,1,1");
-	A<<MATRIX.Eyes(3);
+	A = A<<MATRIX.Eyes(3);
 	
-	EXPECT_EQ( A.makeRREF() , (MATRIX.Eyes(3)<<(B.inv())) );
+	EXPECT_EQ( A.RREF() , (MATRIX.Eyes(3)<<(B.inv())) );
 }
 
 // 랭크
