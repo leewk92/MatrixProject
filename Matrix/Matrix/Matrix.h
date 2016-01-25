@@ -20,7 +20,7 @@
 using namespace std;
 
 class Matrix{
-private:
+protected:
 	double **mat;
 	int row;
 	int col;
@@ -54,7 +54,7 @@ public:
 	static Matrix Rands(int n);
 
 	// functions
-	Matrix& T() const;			// transpose
+	virtual Matrix& T() const;			// transpose
 	Matrix& inv() const;			// inverse 
 	double det() const;			// determinant;
 	double cofactor(Index l, Index m) const;		// cofactor;

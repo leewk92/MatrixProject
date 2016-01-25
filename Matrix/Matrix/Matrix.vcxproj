@@ -87,6 +87,7 @@
     <ClInclude Include="Global.h" />
     <ClInclude Include="Index.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

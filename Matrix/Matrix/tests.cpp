@@ -15,10 +15,11 @@
 #define TESTS_CPP
 #include <gtest\gtest.h>
 #include "Matrix.h"
+#include "Vector.h"
 
-const int INVERSE_MAX_SIZE = 10;
-const int GAUSSIAN_INVERSE_MAX_SIZE = 40;
-const int DET_ELEMENTARY_ROW_OPERATION_MAX_SIZE = 160;
+const int INVERSE_MAX_SIZE = 4;		//10
+const int GAUSSIAN_INVERSE_MAX_SIZE = 10;		//40
+const int DET_ELEMENTARY_ROW_OPERATION_MAX_SIZE = 20;		//160
 //typedef int Matrix;
 static Matrix MATRIX;
 
@@ -417,6 +418,21 @@ TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,COMPARE){
 	Matrix rand = MATRIX.Rands(DET_ELEMENTARY_ROW_OPERATION_MAX_SIZE/10);
 
 	EXPECT_TRUE(rand.det()!=1);
+}
+
+
+TEST(VECTOR_TEST,VALUE){
+	Vector v1 = Vector(3);
+	Vector v2 = Vector("0,0,0");
+
+	EXPECT_TRUE(v1 == v2);
+}
+
+TEST(VECTOR_TRANSPOSE_TEST,VALUE){
+	Vector v1 = Vector("1,2,3");
+	Vector v2 = Vector("1;2;3");
+
+	EXPECT_TRUE(v1.T() == v2);
 }
 
 
