@@ -45,6 +45,7 @@ public:
 
 	// Destructor
 	~Matrix();
+
 	// static Factory methods
 	static Matrix Zeros(int n);
 	static Matrix Zeros(int l,int m);
@@ -54,8 +55,8 @@ public:
 	static Matrix Rands(int n);
 
 	// functions
-	virtual Matrix& T() const;			// transpose
-	Matrix& inv() const;			// inverse 
+	Matrix& T() const;			// transpose
+	virtual Matrix& inv() const final;			// inverse 
 	double det() const;			// determinant;
 	double cofactor(Index l, Index m) const;		// cofactor;
 	Matrix& adjoint() const;		// adjoint matrix

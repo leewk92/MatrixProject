@@ -20,7 +20,8 @@ public:
 	static Vector Rands(int n);
 
 	//functions
-	virtual Vector& T() ;
+	virtual Vector& T();
+//	virtual Vector& inv() const;
 };
 
 Vector::Vector(){
@@ -68,11 +69,12 @@ Vector Vector::Rands(int n){
 
 // functions
 Vector& Vector::T(){
-	
+	cout << "vector Transpose" << endl;
 	isVertical= !isVertical;
 	Vector *retVec = new Vector(Matrix::T());
 	return *retVec;
 }
+
 
 
 #endif

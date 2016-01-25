@@ -435,6 +435,13 @@ TEST(VECTOR_TRANSPOSE_TEST,VALUE){
 	EXPECT_TRUE(v1.T() == v2);
 }
 
+TEST(VECTOR_INVERSE_SEALED_TEST,VALUE){
+	Vector v1 = Vector("1,2,3");
+	Vector v2 = Vector("1;2;3");
+	v1.inv();
 
+	cout << v1.inv();
+	EXPECT_TRUE(v1.inv() == v2);
+}
 
 #endif
