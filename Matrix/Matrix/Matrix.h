@@ -16,18 +16,14 @@
 #include <map>
 #include "Index.h"
 #include "Global.h"
-
+#include "GenericMatrixOperationImpl.h"
 using namespace std;
 
-class Matrix{
+class Matrix : public GenericMatrixOperationImpl<Matrix>{
 protected:
-	double **mat;
-	int row;
-	int col;
-	map<string, function<double(double,double)>> functions;
-
+	
 	// functions
-	void initializeFunctions();
+	//void initializeFunctions();
 	bool makeFirstLeadingEntryNotZero(Index i);
 	int makeNCommaNNotZero(Index n);
 	Matrix& gaussianElimination(bool isRREF) const ;	// ifRREF is false then it makes REF
@@ -55,7 +51,7 @@ public:
 	static Matrix Rands(int n);
 
 	// functions
-	Matrix& T() const;			// transpose
+	Matrix& T() override;			// transpose
 	virtual Matrix& inv() const final;			// inverse 
 	double det() const;			// determinant;
 	double cofactor(Index l, Index m) const;		// cofactor;
@@ -74,22 +70,23 @@ public:
 	Matrix& elementaryRowOperation(int &changeNum) const;
 	double elementaryRowOperationDet() const;
 
-	// operator overload
-	Matrix& operator+ (const Matrix& right) const;
-	Matrix& operator- (const Matrix& right) const;
-	Matrix& operator* (const Matrix& right) const;
-	Matrix& operator+ (double k) const;
-	Matrix& operator- (double k) const;
-	Matrix& operator* (double k) const;
-	Matrix& operator/ (double k) const;
-	Matrix& operator- () const;
-	Matrix& operator= (const Matrix& right);
-	Matrix& operator<< (const Matrix& right) const;
+	// operator overriding 
+	Matrix& operator+ (const Matrix& right) const override;
+	Matrix& operator- (const Matrix& right) const override;
+	Matrix& operator+ (double k) const override;
+	Matrix& operator- (double k) const override;
+	Matrix& operator* (double k) const override;
+	Matrix& operator/ (double k) const override;
+	Matrix& operator- () const override;
+	Matrix& operator= (const Matrix& right) override;
+	Matrix& operator<< (const Matrix& right) const override;
 
-	void operator+= (double k);
-	void operator-= (double k);
-	void operator*= (double k);
-	void operator/= (double k);
+	void operator+= (double k) override;
+	void operator-= (double k) override;
+	void operator*= (double k) override;
+	void operator/= (double k) override;
+
+	Matrix& operator* (const Matrix& right) const;
 
 	friend bool operator== (const Matrix left, const Matrix right);
 	friend bool operator!= (const Matrix left, const Matrix right);
@@ -109,38 +106,11 @@ public:
 };
 
 // Constructors
-Matrix::Matrix(){
-	initializeFunctions();
+Matrix::Matrix():GenericMatrixOperationImpl(){
 }
-Matrix::Matrix(int n){
-	initializeFunctions();
-
-	this->mat = new double*[n];
-	for(int i=0; i<n; i++){
-		mat[i] = new double[n];
-	}
-	for(int i=0; i<n; i++){
-		for(int j=0; j<n; j++){
-			mat[i][j] = 0;
-		}
-	}
-	this->row = n;
-	this->col = n;
-	
+Matrix::Matrix(int n):GenericMatrixOperationImpl(n){	
 }
-Matrix::Matrix(int l,int m){
-	initializeFunctions();
-	this->mat = new double*[l];
-	for(int i=0; i<l; i++){
-		mat[i] = new double[m];
-	}
-	for(int i=0; i<l; i++){
-		for(int j=0; j<m; j++){
-			mat[i][j] = 0;
-		}
-	}
-	this->col = l;
-	this->row = m;
+Matrix::Matrix(int l,int m):GenericMatrixOperationImpl(l,m){
 }
 
 Matrix::Matrix(const Matrix& right){
@@ -157,34 +127,16 @@ Matrix::Matrix(const Matrix& right){
 		}
 	}
 }
+//
+//void Matrix::initializeFunctions(){
+//	functions["+"] = add;
+//	functions["-"] = sub;
+//	functions["*"] = mult;
+//	functions["/"] = devi;
+//}
 
-void Matrix::initializeFunctions(){
-	functions["+"] = add;
-	functions["-"] = sub;
-	functions["*"] = mult;
-	functions["/"] = devi;
-}
 
-
-Matrix::Matrix(string sentence){
-	initializeFunctions();
-	vector<string> row_string;
-	//assert(sentence[0] =='[' && sentence[sentence.size()-1]==']',"sentence must be start with '[' and end with ']'");
-	Tokenize(sentence, row_string,";");
-	this->col = row_string.size();
-	mat = new double*[col];
-	for(int i=0; i<col; i++){
-		vector<string> col_string;
-		Tokenize(row_string[i],col_string,",");
-		if(i !=0) {
-			assert(this->row == col_string.size(),"row size must be consistent");
-		}
-		this->row = col_string.size();
-		mat[i] = new double[row];
-		for(int j=0; j<row; j++){
-			mat[i][j] = stod(col_string[j]);
-		}
-	}	
+Matrix::Matrix(string sentence):GenericMatrixOperationImpl(sentence){
 }
 
 // Destructor
@@ -238,7 +190,7 @@ Matrix Matrix::Rands(int n){
 }
 
 // functions
-Matrix& Matrix::T() const {
+Matrix& Matrix::T() {
 	Matrix *retMat = new Matrix(row,col);
 	for(int i=0; i<retMat->col; i++){
 		for(int j=0; j<retMat->row; j++){
@@ -530,6 +482,7 @@ Matrix& Matrix::elementaryRowOperationInv() const {
 
 
 // Operator overloadings
+
 Matrix& Matrix::operator+ (const Matrix& right) const {
 	assert(row==right.row && col==right.col,"ERROR : size must be same");
 
@@ -546,6 +499,7 @@ Matrix& Matrix::operator- (const Matrix& right) const {
 	return *retMat;
 }
 Matrix& Matrix::operator* (const Matrix& right) const {
+
 	assert(row==right.col,"ERROR : left.row must be same to right.col");
 	
 	Matrix *retMat = new Matrix(this->col, right.row);

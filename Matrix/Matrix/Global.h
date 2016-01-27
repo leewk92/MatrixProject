@@ -1,3 +1,5 @@
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 const double SMALLVAL = 0.0000001;
 
@@ -24,3 +26,4 @@ void Tokenize(const string& str, vector<string>& tokens, const string& silcer = 
     }
 }
 
+#endif

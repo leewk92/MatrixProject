@@ -84,6 +84,7 @@
     <ClCompile Include="tests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GenericMatrixOperationImpl.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="Index.h" />
     <ClInclude Include="Matrix.h" />
