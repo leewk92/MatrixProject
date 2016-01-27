@@ -420,13 +420,32 @@ TEST(DET_ELEMENTARY_ROW_OPERATION_TEST,COMPARE){
 	EXPECT_TRUE(rand.det()!=1);
 }
 
-
+// Vector 
 TEST(VECTOR_TEST,VALUE){
 	Vector v1 = Vector(3);
 	Vector v2 = Vector("0,0,0");
 
 	EXPECT_TRUE(v1 == v2);
 }
+
+TEST(VECTOR_ADD_TEST,VALUE){
+	Vector v1 = Vector("1,2,3");
+	Vector v2 = Vector("3,2,1");
+	Vector v3 = Vector("4,4,4");
+
+	EXPECT_EQ(v1+v2,v3);
+}
+
+TEST(VECTOR_ADD_CONSTANT_TEST,VALUE){
+	Vector v1 = Vector("1,2,3");
+	Vector v2 = v1 + 2;
+	Vector v3 = Vector("3,4,5");
+
+	EXPECT_EQ(v2,v3);
+}
+
+
+
 TEST(VECTOR_MULTIPLY_TEST,VALUE){
 	Vector v1 = Vector("1,2,3");
 	Vector v2 = Vector("1,2,3");
@@ -438,6 +457,25 @@ TEST(VECTOR_MULTIPLY_TEST,VALUE){
 	
 	EXPECT_TRUE(v1 == v2);
 }
+
+TEST(VECTOR_MULTIPLY_CONSTANT_TEST,VALUE){
+	Vector v1 = Vector("1,2,3");
+	Vector v2 = Vector("2,4,6");
+
+	Vector v3 = v1*2;
+	
+	EXPECT_EQ(v3, v2);
+}
+
+TEST(VECTOR_MULTIPLY_TEST,DISTRIBUTION){
+	Vector v1 = Vector("1,2,3");
+	Vector v2 = Vector("3,2,1");
+	Vector v3 = Vector("8,8,8");
+	
+	EXPECT_EQ(2*(v1+v2), 2*v1 + 2*v2);
+}
+
+
 TEST(VECTOR_TRANSPOSE_TEST,VALUE){
 	Vector v1 = Vector("1,2,3");
 	Vector v2 = Vector("1;2;3");
@@ -448,9 +486,7 @@ TEST(VECTOR_TYPECAST_TEST,VALUE){
 	Vector v1 = Vector("1,2,3");
 	Matrix m1 = Matrix("1,2,3");
 	Vector v2 = m1;
-	v1 = Vector("1,2,3");
-	v2 = Vector("1;2;3");
-	
+		
 	//EXPECT_EQ(v1,m1);
 	EXPECT_EQ(v1,v2);
 }
