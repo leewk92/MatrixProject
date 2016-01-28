@@ -79,9 +79,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GenericMatrixOperationImpl.cpp" />
+    <ClCompile Include="Global.cpp" />
+    <ClCompile Include="Index.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="tests.cpp" />
+    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GenericMatrixOperationImpl.h" />

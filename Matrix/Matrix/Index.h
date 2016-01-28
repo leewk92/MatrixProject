@@ -1,9 +1,6 @@
 #ifndef INDEX_H
 #define INDEX_H
 
-#include <iostream>
-using namespace std;
-
 class Index{
 private:
 	int row;
@@ -17,21 +14,5 @@ public:
 	Index& operator ++();
 };
 
-Index::Index(){
-}
-Index::Index(const int& index){
-	this->index = index;
-}
 
-Index& Index::operator= (const int& i){
-	index = i;
-	return *this;
-}
-Index::operator int() {
-	return index;
-}
-Index& Index::operator++(){
-	index += 1;
-	return *this;
-}
 #endif

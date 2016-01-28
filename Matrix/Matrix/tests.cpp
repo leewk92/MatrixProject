@@ -492,5 +492,15 @@ TEST(VECTOR_TYPECAST_TEST,VALUE){
 	EXPECT_EQ(v1,v2);
 }
 
+TEST(VECTOR_DOTPRODUCT_TEST,VALUE){
+	Vector v1 = Vector("1,2,3");
+	Vector m1 = Vector("1,2,3");
+	
+	double value = v1.dotProduct(m1);
+		
+	//EXPECT_EQ(v1,m1);
+	EXPECT_EQ(value , 1+4+9);
+}
+
 
 #endif
