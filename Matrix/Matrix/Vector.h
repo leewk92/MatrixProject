@@ -3,7 +3,11 @@
 
 #include <iostream>
 #include "GenericMatrixOperationImpl.h"
+
+
 using namespace std;
+
+
 
 class Vector : public GenericMatrixOperationImpl<Vector>  {
 
@@ -18,7 +22,7 @@ public:
 	// Constructor
 	Vector();
 	Vector(int n);
-	Vector(string s);
+	explicit Vector(string s);
 	Vector(const Matrix& right);
 	Vector(const Vector& right);
 
@@ -32,6 +36,9 @@ public:
 
 	//functions
 	Vector& T() override;
+	double dotProduct(const Vector& right) const;
+	Vector& crossProduct(const Vector& right) const;
+
 
 	// operator overriding 
 	Vector& operator+ (const Vector& right) const override;
@@ -63,6 +70,7 @@ public:
 
 	int getCol();
 	int getRow();
+	bool getIsVertical();
 };
 
 // Constructors
@@ -172,6 +180,26 @@ Vector& Vector::T(){
 	
 	return *retVec;
 }
+
+double Vector::dotProduct(const Vector& right) const{
+	double retVal = 0;
+	assert(isVertical == right.isVertical && isVertical == false, "dot product is able for parallel vectors.");
+	assert(row == right.row , "dot product is able for same size vectors.");
+	for(int i=0; i<row; i++){
+		retVal += (*this)(i+1) * right(i+1);
+	}
+	return retVal;
+}
+Vector& Vector::crossProduct(const Vector& right) const{
+	assert(isVertical == right.isVertical && isVertical == false, "cross product is able for parallel vectors.");
+	assert(row == right.row && row == 3 , "cross product is able for same size vectors.");
+
+	Matrix tmpMat(row,row);
+//	tmpMat(1) = Matrix(new Vector("1,1,1"));
+//	tmpMat(2) = Matrix(new Vector(*this));
+	return Vector(1);
+}
+
 
 
 
@@ -409,4 +437,14 @@ ostream& operator<<(ostream& os, const Vector& right)
     return os;
 }
 
+int Vector::getCol(){
+	return col;
+}
+int Vector::getRow(){
+	return row;
+}
+
+bool Vector::getIsVertical(){
+	return isVertical;
+}
 #endif

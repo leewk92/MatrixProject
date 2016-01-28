@@ -14,6 +14,7 @@
 #ifndef TESTS_CPP
 #define TESTS_CPP
 #include <gtest\gtest.h>
+
 #include "Matrix.h"
 #include "Vector.h"
 

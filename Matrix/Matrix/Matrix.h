@@ -17,9 +17,13 @@
 #include "Index.h"
 #include "Global.h"
 #include "GenericMatrixOperationImpl.h"
+
+//class Vector;
+
 using namespace std;
 
-class Matrix : public GenericMatrixOperationImpl<Matrix>{
+class Matrix : public GenericMatrixOperationImpl<Matrix> {
+	
 protected:
 	
 	// functions
@@ -31,13 +35,15 @@ protected:
 	Matrix* operateLoop(Matrix* detMat, double k , string _operator) const;
 
 public:
-
+	
 	// Constructors
 	Matrix();
+//	Matrix(Vector right);
 	explicit Matrix(int n);
 	Matrix(int l,int m);
-	Matrix(string sentence);
+	explicit Matrix(string sentence);
 	Matrix(const Matrix& matrix);
+	
 
 	// Destructor
 	~Matrix();
@@ -52,7 +58,7 @@ public:
 
 	// functions
 	Matrix& T() override;			// transpose
-	virtual Matrix& inv() const final;			// inverse 
+	Matrix& inv() const;			// inverse 
 	double det() const;			// determinant;
 	double cofactor(Index l, Index m) const;		// cofactor;
 	Matrix& adjoint() const;		// adjoint matrix
@@ -98,7 +104,7 @@ public:
 	//double& operator()(int l,int m);
 	double& operator()(Index l,Index m) const;
 	Matrix& operator()(Index col) const;
-
+	
 	//getter, setter
 	int getRow() const;
 	int getCol() const;
@@ -135,6 +141,29 @@ Matrix::Matrix(const Matrix& right){
 //	functions["/"] = devi;
 //}
 
+//Matrix::Matrix(Vector right){
+//	
+//
+//	this->col = right.getCol();
+//	this->row = right.getRow();
+//	bool isVertical = right.getIsVertical();
+//	initializeFunctions();
+//	this->mat = new double*[col];
+//	for(int i=0; i<col; i++){
+//		mat[i] = new double[row];
+//	}
+//
+//	if(isVertical){
+//		for(int i=0; i<col; i++){
+//			mat[i][0] = right(i+1);
+//		}
+//	}
+//	else{
+//		for(int i=0; i<row; i++){
+//			mat[0][row] = right(i+1);
+//		}
+//	}
+//}
 
 Matrix::Matrix(string sentence):GenericMatrixOperationImpl(sentence){
 }
