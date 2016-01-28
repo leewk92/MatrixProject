@@ -502,5 +502,14 @@ TEST(VECTOR_DOTPRODUCT_TEST,VALUE){
 	EXPECT_EQ(value , 1+4+9);
 }
 
+TEST(VECTOR_CROSSPRODUCT_TEST,VALUE){
+	Vector v1 = Vector("1,0,0");
+	Vector m1 = Vector("0,1,0");
+	
+	Vector v3 = v1.crossProduct(m1);
+		
+	//EXPECT_EQ(v1,m1);
+	EXPECT_EQ(v3,Vector("0,0,1"));
+}
 
 #endif

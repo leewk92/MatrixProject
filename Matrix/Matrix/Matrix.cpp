@@ -36,7 +36,6 @@ Matrix::Matrix(const Matrix& right){
 
 Matrix::Matrix(Vector right){
 	
-
 	this->col = right.getCol();
 	this->row = right.getRow();
 	bool isVertical = right.getIsVertical();
@@ -53,7 +52,7 @@ Matrix::Matrix(Vector right){
 	}
 	else{
 		for(int i=0; i<row; i++){
-			mat[0][row] = right(i+1);
+			mat[0][i] = right(i+1);
 		}
 	}
 }

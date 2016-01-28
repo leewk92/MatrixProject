@@ -138,9 +138,10 @@ Vector& Vector::crossProduct(const Vector& right) const{
 	assert(row == right.row && row == 3 , "cross product is able for same size vectors.");
 
 	Matrix tmpMat(row,row);
-	tmpMat(1) = Vector("1,1,1");
-	tmpMat(2) = (*this);
-	tmpMat(3) = right;
+	
+	tmpMat.replace(1, Vector("1,1,1"));
+	tmpMat.replace(2,*this);
+	tmpMat.replace(3,right);
 
 	Vector *retVec = new Vector(3);
 	(*retVec)(1) = tmpMat.cofactor(1,1);
