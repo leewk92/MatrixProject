@@ -103,7 +103,7 @@ Vector Vector::Rands(int n){
 
 // functions
 Vector& Vector::T(){
-	cout << "vector Transpose" << endl;
+
 	isVertical= !isVertical;	
 	// functions
 

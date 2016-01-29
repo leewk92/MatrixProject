@@ -345,7 +345,6 @@ TEST(MATRIX_SLICE_TEST,VALUE){
 TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TEST,VALUE){
 
 	EXPECT_EQ(A.gaussianInv(), A.inv());
-	//EXPECT_EQ(A3.gaussianInv(), A3.inv());
 }
 
 TEST(MATRIX_INVERSE_USING_GAUSSIAN_ELIMINATION_TEST,LARGE){
@@ -450,9 +449,7 @@ TEST(VECTOR_ADD_CONSTANT_TEST,VALUE){
 TEST(VECTOR_MULTIPLY_TEST,VALUE){
 	Vector v1 = Vector("1,2,3");
 	Vector v2 = Vector("1,2,3");
-
 	Vector v3 = v1.T();
-	//Matrix v4 = v1*v2;
 	Matrix v4 = v3*v1;
 	cout << v4;
 	
@@ -494,22 +491,29 @@ TEST(VECTOR_TYPECAST_TEST,VALUE){
 
 TEST(VECTOR_DOTPRODUCT_TEST,VALUE){
 	Vector v1 = Vector("1,2,3");
-	Vector m1 = Vector("1,2,3");
+	Vector v2 = Vector("1,2,3");
 	
-	double value = v1.dotProduct(m1);
+	double value = v1.dotProduct(v2);
 		
 	//EXPECT_EQ(v1,m1);
 	EXPECT_EQ(value , 1+4+9);
 }
 
+TEST(VECTOR_DOTPRODUCT_TEST,COMMUTATIVE){
+	Vector v1 = Vector("1,2,3");
+	Vector v2 = Vector("2,4,5");
+			
+	EXPECT_EQ(v1.dotProduct(v2), v2.dotProduct(v1));
+}
+
+
 TEST(VECTOR_CROSSPRODUCT_TEST,VALUE){
 	Vector v1 = Vector("1,0,0");
 	Vector m1 = Vector("0,1,0");
-	
 	Vector v3 = v1.crossProduct(m1);
-		
-	//EXPECT_EQ(v1,m1);
+
 	EXPECT_EQ(v3,Vector("0,0,1"));
 }
+
 
 #endif
